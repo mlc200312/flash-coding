@@ -1,0 +1,38 @@
+version: 1
+workspaceRoot: ..
+languages: [zh_CN, en, th, en_id]
+platform:
+  saveUrl: https://ard-i18n-api.flashexpress.pub/v1/translations/save
+  dictionaryBase: https://ali-static-lang.flashexpress.com
+  timeoutMs: 30000
+  maxRetries: 3
+
+modules:
+  flm-flp-base-business:
+    repoRoot: flm-flp-base-business/flm-flp-base-business
+    domainPath: flm-flp-base-business-domain
+    os: flp-code
+    packages: [com.flashfin.base.business.domain.type]
+    codeFile: BaseBusinessCodeMessages
+    enumFile: BaseBusinessEnumerableMessages
+  flm-flp-ms-server:
+    repoRoot: flm-flp-ms-server/flm-flp-ms-server
+    domainPath: flm-flp-ms-domain
+    os: flp-code
+    packages: [com.flashfin.flp.ms.domain.type, com.flashfin.flp.ms.domain.accounting.type, com.flashfin.flp.ms.domain.trade.type, com.flashfin.flp.ms.domain.fx.type, com.flashfin.flp.ms.domain.settle.type, com.flashfin.flp.ms.domain.paycore.type]
+    codeFile: MsCodeMessages
+    enumFile: MsEnumerableMessages
+  flm-flp-mp-server:
+    repoRoot: flm-flp-mp-server/flm-flp-mp-server
+    domainPath: flm-flp-mp-domain
+    os: flp-code
+    packages: [com.flashfin.flp.mp.domain.type, com.flashfin.flp.mp.domain.trade.type, com.flashfin.flp.mp.domain.account.type]
+    codeFile: MpCodeMessages
+    enumFile: MpEnumerableMessages
+  flm-openapi-server:
+    repoRoot: flm-openapi-server/flm-fcp-openapi-server
+    domainPath: flm-fcp-openapi-domain
+    os: flp-code
+    packages: [com.flashfin.flp.openapi.domain.type, com.flashmoney.fcp.openapi.domain.type]
+    codeFile: OpenApiCodeMessages
+    enumFile: OpenApiEnumerableMessages

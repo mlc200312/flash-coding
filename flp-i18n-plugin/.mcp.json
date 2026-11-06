@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "flp-i18n": {
+      "command": "${QODER_NODE_RUNTIME}",
+      "args": [
+        "${QODER_PLUGIN_ROOT}/server/dist/index.js"
+      ],
+      "cwd": "${QODER_PLUGIN_ROOT}",
+      "timeout": 600000,
+      "env_vars": [
+        "FLP_I18N_CLI_JAR",
+        "FLP_I18N_CONFIG",
+        "FLP_I18N_ALLOWED_ROOTS",
+        "FLP_I18N_TOKEN"
+      ]
+    }
+  }
+}

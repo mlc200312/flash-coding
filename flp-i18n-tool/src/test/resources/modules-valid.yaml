@@ -1,0 +1,15 @@
+version: 1
+languages: [zh_CN, en, th, en_id]
+platform:
+  saveUrl: http://127.0.0.1:18080/v1/translations/save
+  dictionaryBase: http://127.0.0.1:18080
+  timeoutMs: 1000
+  maxRetries: 2
+modules:
+  demo:
+    repoRoot: demo
+    domainPath: demo/demo-domain
+    os: flp-enum
+    packages: [com.example.demo.type]
+    codeFile: DemoCodeMessages
+    enumFile: DemoEnumerableMessages
