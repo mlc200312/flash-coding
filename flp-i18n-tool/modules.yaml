@@ -1,5 +1,5 @@
 version: 1
-workspaceRoot: ..
+workspaceRoot: ../flp
 languages: [zh_CN, en, th, en_id]
 platform:
   saveUrl: https://ard-i18n-api.flashexpress.pub/v1/translations/save

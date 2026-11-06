@@ -1,6 +1,6 @@
 # FLP 多语言同步插件：安装与使用
 
-本文档对应插件 `flp-i18n@local` 0.1.1、MCP Server `flp-i18n-mcp` 0.1.0、Java CLI `flp-i18n-tool` 0.1.0。
+本文档对应插件 `flp-i18n@local` 0.1.2、MCP Server `flp-i18n-mcp` 0.1.0、Java CLI `flp-i18n-tool` 0.1.0。
 
 组件关系：
 
@@ -68,39 +68,81 @@ modules:
 
 ```bash
 cd flp-i18n-plugin
-./package.sh
-# 产物：dist/flp-i18n-plugin-0.1.1.zip
+./package.sh            # 便携包（默认），适合分发到其他机器
+./package.sh --local    # 把本机路径写进 .mcp.json，适合在打包机上直接安装
+# 产物：dist/flp-i18n-plugin-0.1.2.zip
 ```
 
-打包脚本会：
+- **便携模式（默认）**：`.mcp.json` 的 `env` 写占位路径（`/absolute/path/to/...`），由安装脚本注入真实路径。
+- **本机模式（`--local`）**：读取 `FLP_I18N_CLI_JAR`、`FLP_I18N_CONFIG`、`FLP_I18N_ALLOWED_ROOTS`（缺省用仓库默认路径）并写死。
 
-1. 构建并 bundle MCP Server 到 `server/dist/index.js`；
-2. 将 `.qoder-plugin/`、`.mcp.json`、`skills/`、`commands/`、`server/`、`README.md` 放到 zip 根目录；
-3. 把下面三个路径变量写入包内 `.mcp.json` 的 `env`：
-   - `FLP_I18N_CLI_JAR`（默认 `../flp-i18n-tool/target/flp-i18n-cli.jar`）
-   - `FLP_I18N_CONFIG`（默认 `../flp-i18n-tool/modules.yaml`）
-   - `FLP_I18N_ALLOWED_ROOTS`（默认工作区根目录）
+两种模式都会构建并 bundle MCP Server，并把 `.qoder-plugin/`、`.mcp.json`、`skills/`、`commands/`、`server/`、`docs/`、`README.md`、`install.sh`、`install.ps1` 放在 zip 根目录。Token 永远不会写入包内。
 
-如需指向其他位置，打包前设置环境变量：
+### 2. 一键安装
+
+前置：目标机器已安装并启动过一次 Qoder，且准备了 Java 8+、`flp-i18n-cli.jar`、`modules.yaml` 和业务仓库。
+
+**macOS / Linux**
 
 ```bash
-FLP_I18N_CLI_JAR=/path/to/flp-i18n-cli.jar \
-FLP_I18N_CONFIG=/path/to/modules.yaml \
-FLP_I18N_ALLOWED_ROOTS=/path/to/workspace1:/path/to/workspace2 \
-./package.sh
+unzip flp-i18n-plugin-0.1.2.zip -d flp-i18n-plugin
+./flp-i18n-plugin/install.sh \
+  --jar /abs/path/flp-i18n-cli.jar \
+  --config /abs/path/modules.yaml \
+  --roots /abs/path/workspace
 ```
 
-Token 不会被写入包内。
+也可以不解压，直接指定 zip：
 
-### 2. 安装
-
-在 Qoder 插件安装入口选择 `dist/flp-i18n-plugin-0.1.1.zip`。安装后插件为用户级并默认启用，安装位置：
-
-```text
-~/.qoder/plugins/cache/local/flp-i18n/0.1.1/
+```bash
+./install.sh --zip flp-i18n-plugin-0.1.2.zip \
+  --jar /abs/path/flp-i18n-cli.jar \
+  --config /abs/path/modules.yaml \
+  --roots /abs/path/workspace
 ```
 
-安装完成后应能看到：
+**Windows PowerShell**
+
+```powershell
+Expand-Archive .\flp-i18n-plugin-0.1.2.zip -DestinationPath .\flp-i18n-plugin
+.\flp-i18n-plugin\install.ps1 `
+  -Jar    C:\path\flp-i18n-cli.jar `
+  -Config C:\path\modules.yaml `
+  -Roots  C:\path\workspace
+```
+
+安装脚本会：
+
+1. 校验 jar、配置、允许根目录是否存在；
+2. 检查 Qoder 是否正在运行（运行中默认中止，可加 `--allow-running` / `-AllowRunning`）；
+3. 复制到 `~/.qoder/plugins/cache/local/flp-i18n/<version>/`（Windows 为 `%USERPROFILE%\.qoder\...`），已有同版本自动改名备份；
+4. 把真实路径写入安装目录 `.mcp.json` 的 `env`；
+5. 更新 `installed_plugins_v2.json` 与 `settings.json`，修改前备份为 `*.bak-<时间戳>`；
+6. 若当前终端已设置 `FLP_I18N_TOKEN`：macOS 通过 `launchctl setenv` 注入当前登录会话（不回显）；Windows 需额外加 `-PersistToken` 才写入用户环境变量。
+
+常用参数：
+
+| macOS/Linux | Windows | 说明 |
+| --- | --- | --- |
+| `--jar` | `-Jar` | CLI jar 绝对路径 |
+| `--config` | `-Config` | `modules.yaml` 绝对路径 |
+| `--roots` | `-Roots` | 允许访问的根目录，多个用 `:`（Windows 用 `;`）分隔 |
+| `--zip` | `-Zip` | 从 zip 安装 |
+| `--qoder-home` | `-QoderHome` | Qoder 数据目录，默认 `~/.qoder` / `%USERPROFILE%\.qoder` |
+| `--no-register` | `-NoRegister` | 只落盘，不写 Qoder 注册信息 |
+| `--allow-running` | `-AllowRunning` | Qoder 运行中也继续安装 |
+
+安装完成后必须**完全退出并重新打开 Qoder**，插件与 MCP Server 才会加载。
+
+### 3. 图形界面安装（备用）
+
+如果一键安装后插件未出现，或更习惯 GUI：
+
+1. 在 Qoder 插件安装入口选择 `dist/flp-i18n-plugin-0.1.2.zip`；
+2. 安装位置为 `~/.qoder/plugins/cache/local/flp-i18n/0.1.2/`；
+3. 便携包的 `.mcp.json` 是占位路径，需要手动编辑该文件的 `env`，写入真实的 jar、配置和允许根目录，再重启 Qoder（只改文件不重启不生效）。
+
+安装成功后应能看到：
 
 - 技能 `flp-i18n`
 - 命令 `/i18n-sync`
@@ -108,7 +150,7 @@ Token 不会被写入包内。
 
 技能和工具通常在新会话中加载；当前会话看不到时，新开一个对话即可。
 
-### 3. 配置 Token
+### 4. 配置 Token
 
 Token 必须是**纯 JWT**，不要带 `Bearer ` 前缀，前缀由 CLI 自动添加。
 
@@ -149,7 +191,26 @@ launchctl getenv FLP_I18N_TOKEN | awk -F. '{ printf "段数=%d 长度=%d\n", NF,
 
 持久化可选方案：从终端 `export FLP_I18N_TOKEN=...` 后执行 `open -a Qoder`，此时 Qoder 继承该会话环境。
 
-### 4. 验证安装
+**Windows**（不进入命令历史，避免明文留在 PowerShell 记录里）：
+
+```powershell
+$secure = Read-Host "FLP_I18N_TOKEN（纯 JWT，不带 Bearer）" -AsSecureString
+$plain = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
+  [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure))
+[Environment]::SetEnvironmentVariable("FLP_I18N_TOKEN", $plain, "User")
+Remove-Variable plain, secure
+```
+
+写入的是当前用户环境变量（注册表），之后从开始菜单启动的 Qoder 可以读到。也可以手动在「系统属性 → 环境变量」中添加。注意：从已打开的终端/资源管理器启动 Qoder 时，需要重启对应进程才会重新读取环境变量。
+
+**Linux**（如适用）：
+
+```bash
+read -rs FLP_I18N_TOKEN && export FLP_I18N_TOKEN
+qoder   # 需从同一个 shell 启动
+```
+
+### 5. 验证安装
 
 在新会话中任选一种方式：
 
@@ -171,6 +232,21 @@ launchctl getenv FLP_I18N_TOKEN | awk -F. '{ printf "段数=%d 长度=%d\n", NF,
 - `data.remote.platform.reachable = true`（HTTP 200）
 
 CDN 返回 403 属于预期鉴权响应，只要 `reachable=true` 即为可达。
+
+### 6. 升级与卸载
+
+**升级**：退出 Qoder 后，用新版本 zip 重新执行安装脚本即可。脚本按版本目录安装，同版本会先改名备份；`installed_plugins_v2.json` 中的 `installPath` 会指向新版本。
+
+**卸载**：
+
+1. 完全退出 Qoder；
+2. 删除插件目录：
+   - macOS/Linux：`~/.qoder/plugins/cache/local/flp-i18n/`
+   - Windows：`%USERPROFILE%\.qoder\plugins\cache\local\flp-i18n\`
+3. 从 `~/.qoder/plugins/installed_plugins_v2.json` 删除 `"flp-i18n@local"` 条目，从 `~/.qoder/settings.json` 的 `enabledPlugins` 删除同名键；也可以直接用安装时生成的 `*.bak-<时间戳>` 覆盖；
+4. 重启 Qoder。
+
+卸载插件不会删除业务仓库中 `.i18n-tool/backup` 与 `.i18n-tool/journal`，需要时请手动清理。
 
 ---
 

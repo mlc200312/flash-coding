@@ -3,8 +3,8 @@
 把 FLP 多语言同步能力接入 Qoder：Agent 可以发现 `flp-i18n` 技能、使用 `/i18n-sync` 命令，并通过
 MCP 工具完成模块检查、上传缺失 key、下载译文回填。
 
-插件本身不包含 Token，也不包含业务仓库代码；Token 只从 Qoder 进程环境变量读取。jar、配置和允许根目录
-在打包时注入 `.mcp.json` 的 `env`，避免依赖 Qoder 启动环境。
+插件本身不包含 Token，也不包含业务仓库代码；Token 只从 Qoder 进程环境变量读取。默认生成便携包，
+`.mcp.json` 中的 jar、配置和允许根目录由 `install.sh` / `install.ps1` 在安装时写入，便于安装到其他机器。
 
 ## 目录结构
 
@@ -16,6 +16,8 @@ flp-i18n-plugin/
 ├── commands/i18n-sync.md         # /i18n-sync 命令
 ├── server/dist/index.js          # 打包后的 MCP Server（单文件，构建产物）
 ├── docs/INSTALL_AND_USAGE.md     # 完整安装与使用文档
+├── install.sh                    # macOS/Linux 一键安装
+├── install.ps1                   # Windows PowerShell 一键安装
 ├── package.sh                    # 构建 MCP bundle 并打 zip
 └── README.md
 ```
@@ -31,17 +33,20 @@ flp-i18n-plugin/
 
 ```bash
 cd flp-i18n-plugin
-./package.sh
-# 产物：dist/flp-i18n-plugin-0.1.1.zip
+./package.sh            # 便携包（默认）
+./package.sh --local    # 把本机路径写死到 .mcp.json
+# 产物：dist/flp-i18n-plugin-0.1.2.zip
 ```
 
 `package.sh` 会：
 
 1. 在 `../flp-i18n-mcp` 执行 `npm run build`；
 2. 用 esbuild 把 MCP Server 及其依赖打包为 `server/dist/index.js`；
-3. 把 `.qoder-plugin/`、`.mcp.json`、`skills/`、`commands/`、`server/`、`docs/`、`README.md` 放到 zip 根目录；
-4. 把 `FLP_I18N_CLI_JAR`、`FLP_I18N_CONFIG`、`FLP_I18N_ALLOWED_ROOTS`（未设置时取本仓库默认路径）
-   写入 zip 内 `.mcp.json` 的 `env`。Token 不会被写入。
+3. 把 `.qoder-plugin/`、`.mcp.json`、`skills/`、`commands/`、`server/`、`docs/`、`README.md`、
+   `install.sh`、`install.ps1` 放到 zip 根目录；
+4. 便携模式写入占位路径，由安装脚本注入真实路径；`--local` 模式写入
+   `FLP_I18N_CLI_JAR`、`FLP_I18N_CONFIG`、`FLP_I18N_ALLOWED_ROOTS`（未设置时取仓库默认路径）。
+   Token 不会被写入。
 
 若只想刷新 bundle：
 
@@ -51,12 +56,33 @@ cd ../flp-i18n-mcp && npm run bundle
 
 ## 安装
 
-在 Qoder 的插件安装入口选择 `dist/flp-i18n-plugin-0.1.1.zip`。zip 根目录即包含 `.qoder-plugin/`，
+macOS / Linux：
+
+```bash
+unzip flp-i18n-plugin-0.1.2.zip -d flp-i18n-plugin
+./flp-i18n-plugin/install.sh --jar /abs/flp-i18n-cli.jar \
+  --config /abs/modules.yaml --roots /abs/workspace
+```
+
+Windows PowerShell：
+
+```powershell
+Expand-Archive .\flp-i18n-plugin-0.1.2.zip -DestinationPath .\flp-i18n-plugin
+.\flp-i18n-plugin\install.ps1 -Jar C:\abs\flp-i18n-cli.jar `
+  -Config C:\abs\modules.yaml -Roots C:\abs\workspace
+```
+
+安装脚本会写入 `~/.qoder/plugins/cache/local/flp-i18n/<version>/`、注入 `.mcp.json` 路径、
+更新 `installed_plugins_v2.json` 与 `settings.json`（改动前备份），安装后需完全退出并重启 Qoder。
+
+也可以照旧在 Qoder 的插件安装入口选择 zip 安装（便携包需手动填 `.mcp.json` 的 `env`）。
 安装后应能看到：
 
 - 技能 `flp-i18n`
 - 命令 `/i18n-sync`
 - MCP Server `flp-i18n` 及其 6 个工具
+
+详细参数、Token 配置、升级与卸载见 `docs/INSTALL_AND_USAGE.md`。
 
 ## 配置环境变量
 
@@ -131,7 +157,7 @@ Token 不要写入 `modules.yaml`、插件目录、README、日志或提交记�
 | 现象 | 处理 |
 | --- | --- |
 | MCP 工具不可见 | 检查插件是否启用、`server/dist/index.js` 是否存在、Qoder 的 MCP 日志（stderr） |
-| 启动报缺少环境变量 | 重新执行 `./package.sh` 安装新包；若仍失败，检查 zip 内 `.mcp.json` 的 `env` |
+| 启动报缺少环境变量 | 重新执行 `install.sh` / `install.ps1` 注入路径；或检查安装目录 `.mcp.json` 的 `env` 是否为真实路径 |
 | `TOKEN_MISSING` / `TOKEN_EXPIRED` | 更新 `FLP_I18N_TOKEN`；status 仍可诊断配置与网络 |
 | `REMOTE_UNAVAILABLE` | 检查 CDN/平台连通性；恢复后重新 dry-run |
 | `GIT_DIRTY` | 提交或 stash 目标仓库改动后重新 dry-run |
@@ -140,6 +166,6 @@ Token 不要写入 `modules.yaml`、插件目录、README、日志或提交记�
 
 ## 版本
 
-- 插件：0.1.1
+- 插件：0.1.2
 - 依赖 MCP Server：`flp-i18n-mcp` 0.1.0
 - 依赖 CLI：`flp-i18n-tool` 0.1.0（`status` 应能正常返回 `moduleCount`）
