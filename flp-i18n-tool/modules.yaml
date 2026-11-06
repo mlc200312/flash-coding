@@ -36,3 +36,17 @@ modules:
     packages: [com.flashfin.flp.openapi.domain.type, com.flashmoney.fcp.openapi.domain.type]
     codeFile: OpenApiCodeMessages
     enumFile: OpenApiEnumerableMessages
+  flm-flp-trade-mservice:
+    repoRoot: flm-flp-trade-mservice/flm-flp-trade-mservice
+    domainPath: flm-flp-trade-domain
+    os: flp-code
+    packages: [com.flashfin.flp.trade.domain.type]
+    codeFile: TradeCodeMessages
+    enumFile: TradeEnumerableMessages
+  flm-flp-trade-paycore-mservice:
+    repoRoot: flm-flp-trade-mservice/flm-flp-trade-mservice
+    domainPath: flm-flp-trade-domain
+    os: flp-code
+    packages: [com.flashfin.flp.paycore.domain.type]
+    codeFile: PayCoreCodeMessages
+    enumFile: PayCoreEnumerableMessages
