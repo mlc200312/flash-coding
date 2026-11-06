@@ -2,6 +2,8 @@
 [CmdletBinding()]
 param(
     [string]$Jar = $env:FLP_I18N_CLI_JAR,
+    [string]$MavenRepo = $env:FLP_I18N_CLI_MAVEN_REPO,
+    [string]$MavenCoord = $env:FLP_I18N_CLI_MAVEN_COORD,
     [string]$Config = $env:FLP_I18N_CONFIG,
     [string]$Roots = $env:FLP_I18N_ALLOWED_ROOTS,
     [string]$Zip,
@@ -32,21 +34,28 @@ function Read-Json([string]$Path, $Default) {
     return (Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json)
 }
 
-if (-not $Jar) { Fail "缺少 -Jar（flp-i18n-cli.jar 路径）" }
 if (-not $Config) { Fail "缺少 -Config（modules.yaml 路径）" }
 if (-not $Roots) { Fail "缺少 -Roots（允许访问的仓库根目录）" }
 
-if (-not (Test-Path -LiteralPath $Jar -PathType Leaf)) { Fail "jar 不存在: $Jar" }
+if ($Jar -and -not (Test-Path -LiteralPath $Jar -PathType Leaf)) { Fail "jar 不存在: $Jar" }
 if (-not (Test-Path -LiteralPath $Config -PathType Leaf)) { Fail "配置不存在: $Config" }
-if (-not (Test-Path -LiteralPath $Roots -PathType Container)) { Fail "允许根目录不存在: $Roots" }
 if (-not (Test-Path -LiteralPath $QoderHome -PathType Container)) {
     Fail "未找到 Qoder 数据目录: $QoderHome（请先安装并启动一次 Qoder，或用 -QoderHome 指定）"
 }
 
-$Jar = (Resolve-Path -LiteralPath $Jar).Path
+$RootsList = @()
+foreach ($entry in ($Roots -split ';')) {
+    if (-not $entry) { continue }
+    if (-not (Test-Path -LiteralPath $entry -PathType Container)) { Fail "允许根目录不存在: $entry" }
+    $RootsList += (Resolve-Path -LiteralPath $entry).Path
+}
+if ($RootsList.Count -eq 0) { Fail "缺少有效的允许根目录" }
+
+if ($Jar) { $Jar = (Resolve-Path -LiteralPath $Jar).Path }
 $Config = (Resolve-Path -LiteralPath $Config).Path
-$Roots = (Resolve-Path -LiteralPath $Roots).Path
+$Roots = $RootsList -join ';'
 $QoderHome = (Resolve-Path -LiteralPath $QoderHome).Path
+$UserConfigPath = Join-Path $QoderHome "plugins\data\flp-i18n-local\config.json"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $TempDir = $null
@@ -103,11 +112,40 @@ try {
         if (-not $server.env) {
             $server | Add-Member -NotePropertyName env -NotePropertyValue ([pscustomobject]@{}) -Force
         }
-        $server.env | Add-Member -NotePropertyName FLP_I18N_CLI_JAR -NotePropertyValue $Jar -Force
+        if ($Jar) {
+            $server.env | Add-Member -NotePropertyName FLP_I18N_CLI_JAR -NotePropertyValue $Jar -Force
+        }
+        else {
+            $server.env.PSObject.Properties.Remove("FLP_I18N_CLI_JAR")
+        }
         $server.env | Add-Member -NotePropertyName FLP_I18N_CONFIG -NotePropertyValue $Config -Force
         $server.env | Add-Member -NotePropertyName FLP_I18N_ALLOWED_ROOTS -NotePropertyValue $Roots -Force
     }
     Write-Json $McpPath $mcp
+
+    $userConfig = [ordered]@{ version = 1 }
+    if (Test-Path -LiteralPath $UserConfigPath) {
+        try {
+            $existing = Get-Content -LiteralPath $UserConfigPath -Raw | ConvertFrom-Json
+            foreach ($property in $existing.PSObject.Properties) {
+                $userConfig[$property.Name] = $property.Value
+            }
+        }
+        catch {
+            Move-Item -LiteralPath $UserConfigPath -Destination "$UserConfigPath.bak-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+        }
+    }
+    if ($Jar) {
+        $userConfig["cliJar"] = $Jar
+    }
+    elseif ($userConfig.Contains("cliJar")) {
+        $userConfig.Remove("cliJar")
+    }
+    if ($MavenRepo) { $userConfig["cliMavenRepo"] = $MavenRepo }
+    if ($MavenCoord) { $userConfig["cliMavenCoordinate"] = $MavenCoord }
+    $userConfig["configFile"] = $Config
+    $userConfig["allowedRoots"] = @($RootsList)
+    Write-Json $UserConfigPath ([pscustomobject]$userConfig)
 
     $registered = $false
     if (-not $NoRegister) {
@@ -171,14 +209,18 @@ try {
     Write-Host "安装完成"
     Write-Host "  版本      : $Version"
     Write-Host "  安装路径  : $Dest"
-    Write-Host "  CLI jar   : $Jar"
+    Write-Host "  CLI jar   : $(if ($Jar) { $Jar } else { 'Maven 自动下载（首次调用时）' })"
     Write-Host "  配置      : $Config"
     Write-Host "  允许根    : $Roots"
+    Write-Host "  用户配置  : $UserConfigPath"
     Write-Host "  注册插件  : $(if ($registered) { '已写入 Qoder 配置' } else { '已跳过（-NoRegister）' })"
     Write-Host "  Token     : $tokenNote"
     Write-Host ""
     Write-Host "下一步：完全退出并重新打开 Qoder，然后验证插件列表出现「FLP 多语言同步」，"
-    Write-Host "且可用 6 个 i18n_* MCP 工具与 /i18n-sync 命令。"
+    Write-Host "且可用 8 个 i18n_* MCP 工具与 /i18n-sync、/i18n-config 命令。"
+    Write-Host ""
+    Write-Host "后续修改配置：在 Qoder 中执行 /i18n-config，或让 Agent 调用 i18n_config_set；"
+    Write-Host "也可以直接编辑上面的「用户配置」文件（不会写入 Token）。"
     Write-Host ""
     if ($registered) {
         Write-Host "回滚：删除 $Dest，并用 $RegPath.bak-$Stamp 与 $SettingsPath.bak-$Stamp 覆盖原文件。"

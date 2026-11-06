@@ -1,7 +1,7 @@
 {
   "name": "flp-i18n",
   "displayName": "FLP 多语言同步",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "扫描代码中的错误码/枚举 key，与翻译平台和 properties 文件双向同步。",
   "author": {
     "name": "Flash Express"

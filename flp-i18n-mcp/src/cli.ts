@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 
-import type { ServerConfig } from "./config";
+import { CliJarResolver } from "./cliJar";
+import type { ConfigProvider } from "./config";
 import { ToolError } from "./errors";
 import type { Logger } from "./logger";
 
@@ -31,13 +32,28 @@ export interface CliResult {
 }
 
 export class CliRunner {
+  private readonly jarResolver: CliJarResolver;
+
   constructor(
-    private readonly config: ServerConfig,
+    private readonly provider: ConfigProvider,
     private readonly logger: Logger,
-  ) {}
+    jarResolver?: CliJarResolver,
+  ) {
+    this.jarResolver = jarResolver ?? new CliJarResolver(logger);
+  }
 
   async run(args: string[], timeoutMs: number): Promise<CliResult> {
-    const [bin, ...prefixArgs] = this.config.command;
+    const config = this.provider.current();
+    if (!config) {
+      throw new ToolError("InternalError", "配置未就绪，无法执行 Java CLI", {
+        hint: "调用 i18n_config_get 查看配置，再用 i18n_config_set 修改 jar / modules.yaml / 允许根目录",
+        cliCode: "CONFIG_INVALID",
+      });
+    }
+    if (config.cliJarMode) {
+      await this.jarResolver.ensure(config);
+    }
+    const [bin, ...prefixArgs] = config.command;
     const argv = [...prefixArgs, ...args, "--json"];
     const startedAt = Date.now();
     this.logger.debug(`执行 CLI: ${bin} ${argv.join(" ")}`);

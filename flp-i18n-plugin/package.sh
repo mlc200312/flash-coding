@@ -74,9 +74,9 @@ const fs = require("fs");
 const file = process.argv[2];
 const parsed = JSON.parse(fs.readFileSync(file, "utf8"));
 for (const server of Object.values(parsed.mcpServers)) {
+  if (server.env) delete server.env.FLP_I18N_CLI_JAR;
   server.env = {
     ...server.env,
-    FLP_I18N_CLI_JAR: "/absolute/path/to/flp-i18n-cli.jar",
     FLP_I18N_CONFIG: "/absolute/path/to/modules.yaml",
     FLP_I18N_ALLOWED_ROOTS: "/absolute/path/to/workspace",
   };

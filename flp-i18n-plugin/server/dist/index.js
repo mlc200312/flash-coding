@@ -2236,8 +2236,8 @@ var require_resolve = __commonJS({
       }
       return count;
     }
-    function getFullPath(resolver, id = "", normalize) {
-      if (normalize !== false)
+    function getFullPath(resolver, id = "", normalize2) {
+      if (normalize2 !== false)
         id = normalizeId(id);
       const p = resolver.parse(id);
       return _getFullPath(resolver, p);
@@ -2985,7 +2985,7 @@ var require_compile = __commonJS({
       const schOrFunc = root.refs[ref];
       if (schOrFunc)
         return schOrFunc;
-      let _sch = resolve.call(this, root, ref);
+      let _sch = resolve3.call(this, root, ref);
       if (_sch === void 0) {
         const schema = (_a3 = root.localRefs) === null || _a3 === void 0 ? void 0 : _a3[ref];
         const { schemaId } = this.opts;
@@ -3012,7 +3012,7 @@ var require_compile = __commonJS({
     function sameSchemaEnv(s1, s2) {
       return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
     }
-    function resolve(root, ref) {
+    function resolve3(root, ref) {
       let sch;
       while (typeof (sch = this.refs[ref]) == "string")
         ref = sch;
@@ -3263,8 +3263,8 @@ var require_utils = __commonJS({
       }
       return ind;
     }
-    function removeDotSegments(path2) {
-      let input2 = path2;
+    function removeDotSegments(path3) {
+      let input2 = path3;
       const output2 = [];
       let nextSlash = -1;
       let len = 0;
@@ -3338,11 +3338,11 @@ var require_utils = __commonJS({
       }
       return output2.join("");
     }
-    function removeDotSegmentsRelative(path2) {
-      if (path2 === "" || path2[0] === "/") {
-        return removeDotSegments(path2);
+    function removeDotSegmentsRelative(path3) {
+      if (path3 === "" || path3[0] === "/") {
+        return removeDotSegments(path3);
       }
-      const segments = path2.split("/");
+      const segments = path3.split("/");
       const last = segments.length - 1;
       const output2 = [];
       let trailingDirectory = false;
@@ -3705,8 +3705,8 @@ var require_schemes = __commonJS({
       }
       if (wsComponent.resourceName) {
         const queryIndex = wsComponent.resourceName.indexOf("?");
-        const path2 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
-        wsComponent.path = path2 && path2 !== "/" ? path2 : void 0;
+        const path3 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
+        wsComponent.path = path3 && path3 !== "/" ? path3 : void 0;
         wsComponent.query = queryIndex === -1 ? void 0 : wsComponent.resourceName.slice(queryIndex + 1);
         wsComponent.resourceName = void 0;
       }
@@ -3866,17 +3866,17 @@ var require_fast_uri = __commonJS({
       }
       return stringScheme;
     }
-    function normalize(uri, options) {
+    function normalize2(uri, options) {
       if (typeof uri === "string") {
         uri = /** @type {T} */
         normalizeString(uri, options);
       } else if (typeof uri === "object") {
         uri = /** @type {T} */
-        parse3(serialize(uri, options), options);
+        parse4(serialize(uri, options), options);
       }
       return uri;
     }
-    function resolve(baseURI, relativeURI, options) {
+    function resolve3(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
       const {
         parsed: baseParsed,
@@ -3915,8 +3915,8 @@ var require_fast_uri = __commonJS({
     function resolveComponent(base, relative, options, skipNormalization) {
       const target = {};
       if (!skipNormalization) {
-        base = parse3(serialize(base, options), options);
-        relative = parse3(serialize(relative, options), options);
+        base = parse4(serialize(base, options), options);
+        relative = parse4(serialize(relative, options), options);
       }
       options = options || {};
       if (!options.tolerant && relative.scheme) {
@@ -4234,7 +4234,7 @@ var require_fast_uri = __commonJS({
       }
       return { parsed, malformedAuthorityOrPort, malformedPercentEncoding, malformedSchemeSpecific, malformedHost, malformedScheme };
     }
-    function parse3(uri, opts) {
+    function parse4(uri, opts) {
       return parseWithStatus(uri, opts).parsed;
     }
     function normalizeString(uri, opts) {
@@ -4266,12 +4266,12 @@ var require_fast_uri = __commonJS({
     }
     var fastUri = {
       SCHEMES,
-      normalize,
-      resolve,
+      normalize: normalize2,
+      resolve: resolve3,
       resolveComponent,
       equal,
       serialize,
-      parse: parse3
+      parse: parse4
     };
     module2.exports = fastUri;
     module2.exports.default = fastUri;
@@ -7243,12 +7243,12 @@ var require_dist = __commonJS({
         throw new Error(`Unknown format "${name}"`);
       return f;
     };
-    function addFormats(ajv, list, fs3, exportName) {
+    function addFormats(ajv, list, fs5, exportName) {
       var _a3;
       var _b;
       (_a3 = (_b = ajv.opts.code).formats) !== null && _a3 !== void 0 ? _a3 : _b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`;
       for (const f of list)
-        ajv.addFormat(f, fs3[f]);
+        ajv.addFormat(f, fs5[f]);
     }
     module2.exports = exports2 = formatsPlugin;
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -8076,10 +8076,10 @@ function mergeDefs(...defs) {
 function cloneDef(schema) {
   return mergeDefs(schema._zod.def);
 }
-function getElementAtPath(obj, path2) {
-  if (!path2)
+function getElementAtPath(obj, path3) {
+  if (!path3)
     return obj;
-  return path2.reduce((acc, key) => acc?.[key], obj);
+  return path3.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -8419,11 +8419,11 @@ function explicitlyAborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path2, issues) {
+function prefixIssues(path3, issues) {
   return issues.map((iss) => {
     var _a3;
     (_a3 = iss).path ?? (_a3.path = []);
-    iss.path.unshift(path2);
+    iss.path.unshift(path3);
     return iss;
   });
 }
@@ -8885,16 +8885,16 @@ function flattenError(error62, mapper = (issue2) => issue2.message) {
 }
 function formatError(error62, mapper = (issue2) => issue2.message) {
   const fieldErrors = { _errors: [] };
-  const processError = (error63, path2 = []) => {
+  const processError = (error63, path3 = []) => {
     for (const issue2 of error63.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError({ issues }, [...path2, ...issue2.path]));
+        issue2.errors.map((issues) => processError({ issues }, [...path3, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError({ issues: issue2.issues }, [...path2, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path3, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError({ issues: issue2.issues }, [...path2, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path3, ...issue2.path]);
       } else {
-        const fullpath = [...path2, ...issue2.path];
+        const fullpath = [...path3, ...issue2.path];
         if (fullpath.length === 0) {
           fieldErrors._errors.push(mapper(issue2));
         } else {
@@ -8933,17 +8933,17 @@ function formatError(error62, mapper = (issue2) => issue2.message) {
 }
 function treeifyError(error62, mapper = (issue2) => issue2.message) {
   const result = { errors: [] };
-  const processError = (error63, path2 = []) => {
+  const processError = (error63, path3 = []) => {
     var _a3;
     for (const issue2 of error63.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError({ issues }, [...path2, ...issue2.path]));
+        issue2.errors.map((issues) => processError({ issues }, [...path3, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError({ issues: issue2.issues }, [...path2, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path3, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError({ issues: issue2.issues }, [...path2, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path3, ...issue2.path]);
       } else {
-        const fullpath = [...path2, ...issue2.path];
+        const fullpath = [...path3, ...issue2.path];
         if (fullpath.length === 0) {
           result.errors.push(mapper(issue2));
           continue;
@@ -8982,8 +8982,8 @@ function treeifyError(error62, mapper = (issue2) => issue2.message) {
 }
 function toDotPath(_path) {
   const segs = [];
-  const path2 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
-  for (const seg of path2) {
+  const path3 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
+  for (const seg of path3) {
     if (typeof seg === "number")
       segs.push(`[${seg}]`);
     else if (typeof seg === "symbol")
@@ -9117,18 +9117,18 @@ var validateAsync = async (schema, value, _ctx) => {
   return result.issues.length === 0;
 };
 var _encode = (_Err) => {
-  const parse3 = _parse(_Err);
+  const parse4 = _parse(_Err);
   const fn = (schema, value, _ctx, _params) => {
     const ctx = _ctx ? { ..._ctx, direction: "backward" } : { direction: "backward" };
-    return parse3(schema, value, ctx, finalizeParams(fn, _params));
+    return parse4(schema, value, ctx, finalizeParams(fn, _params));
   };
   return fn;
 };
 var encode = /* @__PURE__ */ _encode($ZodRealError);
 var _decode = (_Err) => {
-  const parse3 = _parse(_Err);
+  const parse4 = _parse(_Err);
   const fn = (schema, value, _ctx, _params) => {
-    return parse3(schema, value, _ctx, finalizeParams(fn, _params));
+    return parse4(schema, value, _ctx, finalizeParams(fn, _params));
   };
   return fn;
 };
@@ -10623,7 +10623,7 @@ function capSize(inst, size) {
   if (!caps.length)
     return;
   const cap = Math.min(...caps.map((c) => c[0]));
-  const parse3 = inst._zod.parse;
+  const parse4 = inst._zod.parse;
   inst._zod.parse = (payload, ctx) => {
     const n = size(payload.value);
     if (n > cap && !ctx?.skipChecks && ctx?.direction !== "backward") {
@@ -10637,7 +10637,7 @@ function capSize(inst, size) {
         }
       }
     }
-    return parse3(payload, ctx);
+    return parse4(payload, ctx);
   };
 }
 var arraySize = (input2) => Array.isArray(input2) ? input2.length : -1;
@@ -12326,7 +12326,7 @@ var recursive = /* @__PURE__ */ new WeakMap();
 var NONE = 0;
 var ASSUMED = 1;
 var PROVEN = 2;
-function isRecursive(inst, stack, resolve) {
+function isRecursive(inst, stack, resolve3) {
   const cached2 = recursive.get(inst);
   if (cached2 !== void 0)
     return cached2 ? PROVEN : NONE;
@@ -12336,7 +12336,7 @@ function isRecursive(inst, stack, resolve) {
   let result = NONE;
   const check2 = (child) => {
     if (result !== PROVEN && child?._zod) {
-      const answer = isRecursive(child, stack, resolve);
+      const answer = isRecursive(child, stack, resolve3);
       if (answer > result)
         result = answer;
     }
@@ -12347,7 +12347,7 @@ function isRecursive(inst, stack, resolve) {
       const desc = Object.getOwnPropertyDescriptor(sh, key);
       if (spread && !desc.enumerable)
         continue;
-      const child = desc.get ? ASSUMED : desc.value?._zod ? isRecursive(desc.value, stack, resolve) : NONE;
+      const child = desc.get ? ASSUMED : desc.value?._zod ? isRecursive(desc.value, stack, resolve3) : NONE;
       if (child > answer)
         answer = child;
     }
@@ -12411,7 +12411,7 @@ function isRecursive(inst, stack, resolve) {
       break;
     // `$ZodLazy` caches its inner on the def, so a resolved edge is followed exactly
     case "lazy": {
-      const inner = def._cachedInner ?? (resolve ? inst._zod.innerType : void 0);
+      const inner = def._cachedInner ?? (resolve3 ? inst._zod.innerType : void 0);
       merge2(inner ? isRecursive(inner, stack, false) : ASSUMED);
       break;
     }
@@ -26121,13 +26121,13 @@ function resolveRef(ref, ctx) {
   if (!ref.startsWith("#")) {
     throw new Error("External $ref is not supported, only local refs (#/...) are allowed");
   }
-  const path2 = ref.slice(1).split("/").filter(Boolean);
-  if (path2.length === 0) {
+  const path3 = ref.slice(1).split("/").filter(Boolean);
+  if (path3.length === 0) {
     return ctx.rootSchema;
   }
   const defsKey = ctx.version === "draft-2020-12" ? "$defs" : "definitions";
-  if (path2[0] === defsKey) {
-    const key = path2[1] === void 0 ? void 0 : decodeJSONPointerSegment(path2[1]);
+  if (path3[0] === defsKey) {
+    const key = path3[1] === void 0 ? void 0 : decodeJSONPointerSegment(path3[1]);
     if (!key || !ctx.defs[key]) {
       throw new Error(`Reference not found: ${ref}`);
     }
@@ -28350,17 +28350,17 @@ var CompleteRequestSchema = RequestSchema.extend({
   method: literal("completion/complete"),
   params: CompleteRequestParamsSchema
 });
-function assertCompleteRequestPrompt(request) {
-  if (request.params.ref.type !== "ref/prompt") {
-    throw new TypeError(`Expected CompleteRequestPrompt, but got ${request.params.ref.type}`);
+function assertCompleteRequestPrompt(request2) {
+  if (request2.params.ref.type !== "ref/prompt") {
+    throw new TypeError(`Expected CompleteRequestPrompt, but got ${request2.params.ref.type}`);
   }
-  void request;
+  void request2;
 }
-function assertCompleteRequestResourceTemplate(request) {
-  if (request.params.ref.type !== "ref/resource") {
-    throw new TypeError(`Expected CompleteRequestResourceTemplate, but got ${request.params.ref.type}`);
+function assertCompleteRequestResourceTemplate(request2) {
+  if (request2.params.ref.type !== "ref/resource") {
+    throw new TypeError(`Expected CompleteRequestResourceTemplate, but got ${request2.params.ref.type}`);
   }
-  void request;
+  void request2;
 }
 var CompleteResultSchema = ResultSchema.extend({
   completion: looseObject({
@@ -28600,22 +28600,297 @@ var StdioServerTransport = class {
     this.onclose?.();
   }
   send(message) {
-    return new Promise((resolve) => {
+    return new Promise((resolve3) => {
       const json2 = serializeMessage(message);
       if (this._stdout.write(json2)) {
-        resolve();
+        resolve3();
       } else {
-        this._stdout.once("drain", resolve);
+        this._stdout.once("drain", resolve3);
       }
     });
   }
 };
 
 // src/config.ts
+var fs2 = __toESM(require("node:fs"));
+var os2 = __toESM(require("node:os"));
+var path2 = __toESM(require("node:path"));
+
+// src/cliJar.ts
+var import_node_crypto = require("node:crypto");
 var fs = __toESM(require("node:fs"));
+var os = __toESM(require("node:os"));
 var path = __toESM(require("node:path"));
+
+// src/errors.ts
+var ToolError = class extends Error {
+  code;
+  hint;
+  retryable;
+  cliCode;
+  constructor(code, message, options = {}) {
+    super(message);
+    this.name = "ToolError";
+    this.code = code;
+    this.hint = options.hint ?? "";
+    this.retryable = options.retryable ?? false;
+    this.cliCode = options.cliCode ?? null;
+  }
+};
+function toToolError(error62) {
+  if (error62 instanceof ToolError) {
+    return error62;
+  }
+  const message = error62 instanceof Error ? error62.message : String(error62);
+  return new ToolError("InternalError", message);
+}
+function toolErrorFromResult(result, envelope) {
+  const cliError = envelope.error;
+  const message = cliError?.message ?? `CLI \u9000\u51FA\u7801 ${result.exitCode}`;
+  const options = {
+    hint: cliError?.hint ?? "",
+    retryable: cliError?.retryable ?? false,
+    cliCode: cliError?.code ?? null
+  };
+  switch (result.exitCode) {
+    case 2:
+      return new ToolError("InvalidParams", message, options);
+    case 3:
+      return new ToolError("UpstreamError", message, { ...options, retryable: cliError?.retryable ?? true });
+    case 4:
+      return new ToolError("ConfirmationRequired", message, options);
+    default:
+      return new ToolError("InternalError", message, options);
+  }
+}
+
+// src/cliJar.ts
+var MAX_JAR_BYTES = 256 * 1024 * 1024;
+var DOWNLOAD_TIMEOUT_MS = 12e4;
+var CHECKSUM_TIMEOUT_MS = 3e4;
+var COORD_PART = /^[A-Za-z0-9_.-]+$/;
+var CliJarResolver = class {
+  constructor(logger, fetchImpl = fetch, downloadTimeoutMs = DOWNLOAD_TIMEOUT_MS) {
+    this.logger = logger;
+    this.fetchImpl = fetchImpl;
+    this.downloadTimeoutMs = downloadTimeoutMs;
+  }
+  logger;
+  fetchImpl;
+  downloadTimeoutMs;
+  async ensure(config2) {
+    const jarPath = config2.cliJar ?? config2.command[2];
+    if ((config2.cliJarMode ?? "path") !== "maven") {
+      if (!jarPath || !isFile(jarPath)) {
+        throw new ToolError("InternalError", `CLI jar \u4E0D\u5B58\u5728: ${jarPath ?? "(\u672A\u914D\u7F6E)"}`, {
+          hint: "\u68C0\u67E5 FLP_I18N_CLI_JAR \u6216\u7528\u6237\u914D\u7F6E\u7684 cliJar\uFF1B\u4E5F\u53EF\u7559\u7A7A jar \u6539\u7528 Maven \u5750\u6807\u81EA\u52A8\u4E0B\u8F7D",
+          cliCode: "CLI_UNAVAILABLE"
+        });
+      }
+      return jarPath;
+    }
+    if (jarPath && isFile(jarPath)) {
+      return jarPath;
+    }
+    if (!config2.cliMavenRepo || !config2.cliMavenCoordinate) {
+      throw new ToolError("InternalError", "Maven \u81EA\u52A8\u4E0B\u8F7D\u7F3A\u5C11\u4ED3\u5E93\u6216\u5750\u6807", {
+        hint: "\u8BBE\u7F6E FLP_I18N_CLI_MAVEN_REPO \u4E0E FLP_I18N_CLI_MAVEN_COORD",
+        cliCode: "CLI_MAVEN_CONFIG_MISSING"
+      });
+    }
+    const coordinate = parseMavenCoordinate(config2.cliMavenCoordinate);
+    if (!coordinate) {
+      throw new ToolError("InvalidParams", `Maven \u5750\u6807\u975E\u6CD5: ${config2.cliMavenCoordinate}`, {
+        hint: "\u5750\u6807\u683C\u5F0F\u4E3A groupId:artifactId:version[:classifier]",
+        cliCode: "CLI_MAVEN_COORDINATE_INVALID"
+      });
+    }
+    const target = jarPath ?? cacheJarPath(config2.cacheDir ?? defaultCacheDir(), coordinate);
+    await downloadVerifiedJar(config2.cliMavenRepo, coordinate, target, this.fetchImpl, this.downloadTimeoutMs);
+    this.logger.info(`\u5DF2\u4ECE Maven \u4E0B\u8F7D CLI jar: ${target}`);
+    return target;
+  }
+};
+function parseMavenCoordinate(raw) {
+  const parts = raw.trim().split(":");
+  if (parts.length !== 3 && parts.length !== 4) {
+    return null;
+  }
+  const [groupId, artifactId, version2, classifier] = parts;
+  for (const part of parts) {
+    if (!part || !COORD_PART.test(part) || part.includes("..")) {
+      return null;
+    }
+  }
+  if (/-SNAPSHOT$/i.test(version2)) {
+    return null;
+  }
+  if (classifier !== void 0 && !classifier) {
+    return null;
+  }
+  return { groupId, artifactId, version: version2, classifier: classifier ?? null };
+}
+function cacheJarPath(cacheDir, coordinate) {
+  const base = path.resolve(cacheDir);
+  const fileName = `${coordinate.artifactId}-${coordinate.version}${coordinate.classifier ? `-${coordinate.classifier}` : ""}.jar`;
+  const relative = path.join(
+    ...coordinate.groupId.split("."),
+    coordinate.artifactId,
+    coordinate.version,
+    fileName
+  );
+  const resolved = path.resolve(base, relative);
+  if (!resolved.startsWith(`${base}${path.sep}`)) {
+    throw new ToolError("InvalidParams", `Maven \u5750\u6807\u8DEF\u5F84\u975E\u6CD5: ${coordinate.groupId}`, {
+      cliCode: "CLI_MAVEN_COORDINATE_INVALID"
+    });
+  }
+  return resolved;
+}
+function mavenJarUrl(repo, coordinate) {
+  const fileName = `${coordinate.artifactId}-${coordinate.version}${coordinate.classifier ? `-${coordinate.classifier}` : ""}.jar`;
+  const segments = [
+    ...coordinate.groupId.split("."),
+    coordinate.artifactId,
+    coordinate.version,
+    fileName
+  ];
+  return `${repo.replace(/\/+$/, "")}/${segments.join("/")}`;
+}
+function defaultCacheDir(env = process.env) {
+  const explicit = (env.FLP_I18N_CACHE_DIR ?? "").trim();
+  if (explicit && !explicit.includes("${")) {
+    return path.resolve(explicit);
+  }
+  const xdg = (env.XDG_CACHE_HOME ?? "").trim();
+  if (xdg && !xdg.includes("${")) {
+    return path.join(xdg, "flp-i18n", "cli");
+  }
+  return path.join(env.HOME || process.env.HOME || os.homedir(), ".cache", "flp-i18n", "cli");
+}
+async function downloadVerifiedJar(repo, coordinate, target, fetchImpl, timeoutMs) {
+  const url2 = mavenJarUrl(repo, coordinate);
+  const bytes = await fetchBytes(url2, fetchImpl, timeoutMs);
+  const { algorithm, expected } = await fetchChecksum(url2, fetchImpl);
+  const actual = (0, import_node_crypto.createHash)(algorithm).update(bytes).digest("hex");
+  if (actual.toLowerCase() !== expected.toLowerCase()) {
+    throw new ToolError("UpstreamError", `CLI jar \u6821\u9A8C\u5931\u8D25: ${url2}`, {
+      hint: `\u671F\u671B ${algorithm} ${expected}\uFF0C\u5B9E\u9645 ${actual}\uFF1B\u5DF2\u653E\u5F03\u5199\u5165\uFF0C\u8BF7\u68C0\u67E5\u4ED3\u5E93\u5B8C\u6574\u6027`,
+      retryable: false,
+      cliCode: "CLI_CHECKSUM_MISMATCH"
+    });
+  }
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  const tmp = `${target}.part-${process.pid}-${Date.now()}`;
+  try {
+    fs.writeFileSync(tmp, bytes, { mode: 420 });
+    fs.renameSync(tmp, target);
+  } catch (error62) {
+    fs.rmSync(tmp, { force: true });
+    throw new ToolError("InternalError", `\u65E0\u6CD5\u5199\u5165 CLI jar \u7F13\u5B58: ${target}`, {
+      hint: describeError(error62),
+      cliCode: "CLI_CACHE_WRITE_FAILED"
+    });
+  }
+}
+async function fetchChecksum(url2, fetchImpl) {
+  for (const [suffix, algorithm, length] of [
+    [".sha256", "sha256", 64],
+    [".sha1", "sha1", 40]
+  ]) {
+    const response = await request(`${url2}${suffix}`, fetchImpl, CHECKSUM_TIMEOUT_MS);
+    if (response.status === 404) {
+      continue;
+    }
+    if (!response.ok) {
+      throw new ToolError("UpstreamError", `\u65E0\u6CD5\u83B7\u53D6 ${algorithm} \u6821\u9A8C\u6587\u4EF6: ${response.status}`, {
+        hint: `${url2}${suffix}`,
+        retryable: response.status >= 500,
+        cliCode: "CLI_CHECKSUM_FETCH_FAILED"
+      });
+    }
+    const text = await response.text();
+    const match = text.trim().match(new RegExp(`[A-Fa-f0-9]{${length}}`));
+    if (!match) {
+      throw new ToolError("UpstreamError", `${algorithm} \u6821\u9A8C\u6587\u4EF6\u683C\u5F0F\u975E\u6CD5: ${url2}${suffix}`, {
+        retryable: false,
+        cliCode: "CLI_CHECKSUM_INVALID"
+      });
+    }
+    return { algorithm, expected: match[0] };
+  }
+  throw new ToolError("UpstreamError", `Maven \u4ED3\u5E93\u672A\u63D0\u4F9B\u6821\u9A8C\u6587\u4EF6: ${url2}`, {
+    hint: "\u9700\u8981 .sha256 \u6216 .sha1\uFF0C\u62D2\u7EDD\u4E0B\u8F7D\u672A\u6821\u9A8C\u7684 jar",
+    retryable: false,
+    cliCode: "CLI_CHECKSUM_MISSING"
+  });
+}
+async function fetchBytes(url2, fetchImpl, timeoutMs) {
+  const response = await request(url2, fetchImpl, timeoutMs);
+  if (!response.ok) {
+    throw new ToolError("UpstreamError", `\u4E0B\u8F7D CLI jar \u5931\u8D25: ${response.status} ${url2}`, {
+      hint: "\u786E\u8BA4 Maven \u4ED3\u5E93\u5730\u5740\u3001\u5750\u6807\u4E0E\u7F51\u7EDC\u8FDE\u901A\u6027",
+      retryable: response.status >= 500,
+      cliCode: "CLI_DOWNLOAD_FAILED"
+    });
+  }
+  const declared = Number(response.headers.get("content-length") ?? "0");
+  if (declared > MAX_JAR_BYTES) {
+    throw new ToolError("UpstreamError", `CLI jar \u4F53\u79EF\u5F02\u5E38: ${declared} bytes`, {
+      retryable: false,
+      cliCode: "CLI_DOWNLOAD_TOO_LARGE"
+    });
+  }
+  const buffer = Buffer.from(await response.arrayBuffer());
+  if (buffer.byteLength === 0 || buffer.byteLength > MAX_JAR_BYTES) {
+    throw new ToolError("UpstreamError", `CLI jar \u4F53\u79EF\u5F02\u5E38: ${buffer.byteLength} bytes`, {
+      retryable: false,
+      cliCode: "CLI_DOWNLOAD_TOO_LARGE"
+    });
+  }
+  return buffer;
+}
+async function request(url2, fetchImpl, timeoutMs) {
+  try {
+    return await fetchImpl(url2, {
+      redirect: "follow",
+      signal: AbortSignal.timeout(timeoutMs)
+    });
+  } catch (error62) {
+    throw new ToolError("UpstreamError", `\u65E0\u6CD5\u8BBF\u95EE Maven \u4ED3\u5E93: ${url2}`, {
+      hint: `${describeError(error62)}\uFF1B\u68C0\u67E5\u7F51\u7EDC\u3001\u4EE3\u7406\u4E0E\u4ED3\u5E93\u5730\u5740`,
+      retryable: true,
+      cliCode: "CLI_DOWNLOAD_FAILED"
+    });
+  }
+}
+function isFile(filePath) {
+  try {
+    return fs.statSync(filePath).isFile();
+  } catch {
+    return false;
+  }
+}
+function describeError(error62) {
+  return error62 instanceof Error ? error62.message : String(error62);
+}
+
+// src/config.ts
 var READ_TIMEOUT_MS = 12e4;
 var WRITE_TIMEOUT_MS = 6e5;
+var ENV_JAVA = "FLP_I18N_JAVA";
+var ENV_CLI_JAR = "FLP_I18N_CLI_JAR";
+var ENV_CONFIG = "FLP_I18N_CONFIG";
+var ENV_ALLOWED_ROOTS = "FLP_I18N_ALLOWED_ROOTS";
+var ENV_TOKEN = "FLP_I18N_TOKEN";
+var ENV_LOG_LEVEL = "FLP_I18N_LOG_LEVEL";
+var ENV_USER_CONFIG = "FLP_I18N_USER_CONFIG";
+var ENV_CLI_MAVEN_REPO = "FLP_I18N_CLI_MAVEN_REPO";
+var ENV_CLI_MAVEN_COORD = "FLP_I18N_CLI_MAVEN_COORD";
+var DEFAULT_MAVEN_REPO = "https://registry.flashexpress.pub/repository/maven-public/";
+var DEFAULT_MAVEN_COORDINATE = "com.flashfin:flp-i18n-tool:0.1.0";
+var USER_CONFIG_DIR_NAME = "flp-i18n-local";
+var CONFIG_FILE_NAME = "config.json";
 var ConfigError = class extends Error {
   hint;
   constructor(message, hint = "") {
@@ -28624,65 +28899,503 @@ var ConfigError = class extends Error {
     this.hint = hint;
   }
 };
-var ENV_JAVA = "FLP_I18N_JAVA";
-var ENV_CLI_JAR = "FLP_I18N_CLI_JAR";
-var ENV_CONFIG = "FLP_I18N_CONFIG";
-var ENV_ALLOWED_ROOTS = "FLP_I18N_ALLOWED_ROOTS";
-var ENV_TOKEN = "FLP_I18N_TOKEN";
-var ENV_LOG_LEVEL = "FLP_I18N_LOG_LEVEL";
-function loadConfig(env = process.env) {
-  const jarPath = requiredValue(env, ENV_CLI_JAR, "Java CLI jar \u8DEF\u5F84");
-  const configPath = requiredValue(env, ENV_CONFIG, "modules.yaml \u8DEF\u5F84");
-  const allowedRootsRaw = requiredValue(env, ENV_ALLOWED_ROOTS, "\u5141\u8BB8\u8BBF\u95EE\u7684\u5DE5\u4F5C\u533A\u6839\u76EE\u5F55");
-  requireFile(jarPath, ENV_CLI_JAR);
-  requireFile(configPath, ENV_CONFIG);
-  const allowedRoots = allowedRootsRaw.split(path.delimiter).map((entry) => entry.trim()).filter((entry) => entry.length > 0);
-  if (allowedRoots.length === 0) {
-    throw new ConfigError(`${ENV_ALLOWED_ROOTS} \u4E3A\u7A7A`, "\u4F7F\u7528\u8DEF\u5F84\u5206\u9694\u7B26\u8FDE\u63A5\u591A\u4E2A\u5141\u8BB8\u7684\u6839\u76EE\u5F55");
+function resolveUserConfigPath(env = process.env) {
+  const explicit = (env[ENV_USER_CONFIG] ?? "").trim();
+  if (explicit && !explicit.includes("${")) {
+    return path2.resolve(explicit);
   }
-  const javaCommand = (env[ENV_JAVA] ?? "").trim() || "java";
-  const token = (env[ENV_TOKEN] ?? "").trim() || null;
+  const pluginData = (env.QODER_PLUGIN_DATA ?? "").trim();
+  if (pluginData && !pluginData.includes("${")) {
+    return path2.join(pluginData, CONFIG_FILE_NAME);
+  }
+  const configDir = (env.QODER_CONFIG_DIR ?? "").trim();
+  const home = (env.HOME ?? env.USERPROFILE ?? "").trim() || os2.homedir();
+  const base = configDir && !configDir.includes("${") ? configDir : path2.join(home, ".qoder");
+  return path2.join(base, "plugins", "data", USER_CONFIG_DIR_NAME, CONFIG_FILE_NAME);
+}
+function resolveConfig(env, userConfigPath) {
+  const issues = [];
+  const sources = {};
+  const { value: file2, error: fileError } = readUserConfigFile(userConfigPath);
+  if (fileError) {
+    issues.push({ field: "file", message: fileError });
+  }
+  const cacheDir = defaultCacheDir(env);
+  const fileJarDisabled = typeof file2?.cliJar === "string" && file2.cliJar.trim() === "";
+  const fileJar = fileJarDisabled ? null : stringValue(file2?.cliJar, "cliJar", issues);
+  const envJar = envString(env, ENV_CLI_JAR);
+  const explicitJar = fileJarDisabled ? null : fileJar ?? envJar;
+  let cliJarMode = "path";
+  let cliJarPath = null;
+  let mavenRepo = null;
+  let mavenCoordinate = null;
+  if (explicitJar) {
+    cliJarPath = explicitJar;
+    sources.cliJar = fileJar ? "file" : "env";
+    checkFile(explicitJar, "cliJar", "CLI jar", issues);
+  } else {
+    const fileRepo = stringValue(file2?.cliMavenRepo, "cliMavenRepo", issues);
+    const envRepo = envString(env, ENV_CLI_MAVEN_REPO);
+    mavenRepo = mavenRepoValue(fileRepo ?? envRepo ?? DEFAULT_MAVEN_REPO, issues);
+    sources.cliMavenRepo = fileRepo ? "file" : envRepo ? "env" : "default";
+    const fileCoord = stringValue(file2?.cliMavenCoordinate, "cliMavenCoordinate", issues);
+    const envCoord = envString(env, ENV_CLI_MAVEN_COORD);
+    const coordinate = fileCoord ?? envCoord ?? DEFAULT_MAVEN_COORDINATE;
+    mavenCoordinate = mavenCoordinateValue(coordinate, issues);
+    sources.cliMavenCoordinate = fileCoord ? "file" : envCoord ? "env" : "default";
+    if (mavenRepo && mavenCoordinate) {
+      const parsed = parseMavenCoordinate(mavenCoordinate);
+      if (parsed) {
+        cliJarPath = cacheJarPath(cacheDir, parsed);
+        cliJarMode = "maven";
+      }
+    }
+    sources.cliJar = fileRepo || fileCoord ? "file" : envRepo || envCoord ? "env" : "default";
+  }
+  const fileConfig = stringValue(file2?.configFile, "configFile", issues);
+  const configFile = fileConfig ?? envString(env, ENV_CONFIG);
+  sources.configFile = fileConfig ? "file" : configFile ? "env" : "missing";
+  if (!configFile) {
+    issues.push({
+      field: "configFile",
+      message: `\u7F3A\u5C11 modules.yaml \u8DEF\u5F84\uFF08${ENV_CONFIG} \u6216\u914D\u7F6E\u6587\u4EF6 configFile\uFF09`
+    });
+  } else {
+    checkFile(configFile, "configFile", "modules.yaml", issues);
+  }
+  const fileRoots = arrayValue(file2?.allowedRoots, "allowedRoots", issues);
+  const envRootsRaw = envString(env, ENV_ALLOWED_ROOTS);
+  const allowedRoots = fileRoots ?? splitRoots(envRootsRaw);
+  sources.allowedRoots = fileRoots ? "file" : envRootsRaw ? "env" : "missing";
+  if (allowedRoots.length === 0) {
+    issues.push({
+      field: "allowedRoots",
+      message: `\u7F3A\u5C11\u5141\u8BB8\u8BBF\u95EE\u7684\u6839\u76EE\u5F55\uFF08${ENV_ALLOWED_ROOTS} \u6216\u914D\u7F6E\u6587\u4EF6 allowedRoots\uFF09`
+    });
+  }
+  const fileJava = stringValue(file2?.java, "java", issues);
+  const java = fileJava ?? envString(env, ENV_JAVA);
+  sources.java = fileJava ? "file" : java ? "env" : "default";
+  const fileLogLevel = logLevelValue(file2?.logLevel, "logLevel", issues);
+  const envLogLevel = parseLogLevelSoft(envString(env, ENV_LOG_LEVEL), issues);
+  const logLevel = fileLogLevel ?? envLogLevel ?? "info";
+  sources.logLevel = fileLogLevel ? "file" : envLogLevel ? "env" : "default";
+  const token = envString(env, ENV_TOKEN);
+  if (issues.length > 0) {
+    return {
+      config: null,
+      error: new ConfigError(issues[0].message, buildHint(issues)),
+      sources,
+      userConfigPath,
+      userConfig: file2,
+      userConfigError: fileError,
+      issues
+    };
+  }
   return {
-    command: [javaCommand, "-jar", jarPath],
-    configPath,
-    allowedRoots,
-    token,
-    logLevel: parseLogLevel(env[ENV_LOG_LEVEL]),
-    readTimeoutMs: READ_TIMEOUT_MS,
-    writeTimeoutMs: WRITE_TIMEOUT_MS
+    config: {
+      command: [java ?? "java", "-jar", cliJarPath],
+      configPath: configFile,
+      allowedRoots,
+      token,
+      logLevel,
+      readTimeoutMs: READ_TIMEOUT_MS,
+      writeTimeoutMs: WRITE_TIMEOUT_MS,
+      cliJar: cliJarPath,
+      cliJarMode,
+      cliMavenRepo: mavenRepo,
+      cliMavenCoordinate: mavenCoordinate,
+      cacheDir
+    },
+    error: null,
+    sources,
+    userConfigPath,
+    userConfig: file2,
+    userConfigError: null,
+    issues
   };
 }
-function requiredValue(env, name, label) {
-  const value = (env[name] ?? "").trim();
-  if (!value) {
-    throw new ConfigError(`\u7F3A\u5C11\u5FC5\u9700\u73AF\u5883\u53D8\u91CF ${name}\uFF08${label}\uFF09`, `\u8BBE\u7F6E ${name} \u540E\u91CD\u542F MCP Server`);
+function validateUserConfigPatch(patch) {
+  const issues = [];
+  const checks = {};
+  const normalized = {};
+  if (patch.cliJar !== void 0) {
+    if (patch.cliJar.trim() === "") {
+      normalized.cliJar = "";
+      checks.cliJar = "\u5C06\u5FFD\u7565\u672C\u5730 jar \u4E0E\u73AF\u5883\u53D8\u91CF\uFF0C\u6539\u7528 Maven \u81EA\u52A8\u4E0B\u8F7D";
+    } else {
+      const value = cleanPath(patch.cliJar, "cliJar", issues);
+      if (value) {
+        normalized.cliJar = value;
+        const status = checkFile(value, "cliJar", "CLI jar", issues);
+        if (status) {
+          checks.cliJar = status;
+        }
+      }
+    }
   }
-  return value;
+  if (patch.cliMavenRepo !== void 0) {
+    const value = mavenRepoValue(patch.cliMavenRepo, issues);
+    if (value) {
+      normalized.cliMavenRepo = value;
+      checks.cliMavenRepo = "\u4ED3\u5E93\u5730\u5740\u683C\u5F0F\u6709\u6548";
+    }
+  }
+  if (patch.cliMavenCoordinate !== void 0) {
+    const value = mavenCoordinateValue(patch.cliMavenCoordinate, issues);
+    if (value) {
+      normalized.cliMavenCoordinate = value;
+      checks.cliMavenCoordinate = "\u5750\u6807\u683C\u5F0F\u6709\u6548";
+    }
+  }
+  if (patch.configFile !== void 0) {
+    const value = cleanPath(patch.configFile, "configFile", issues);
+    if (value) {
+      normalized.configFile = value;
+      const status = checkFile(value, "configFile", "modules.yaml", issues);
+      if (status) {
+        checks.configFile = status;
+      }
+    }
+  }
+  if (patch.allowedRoots !== void 0) {
+    const roots = [];
+    const seen = /* @__PURE__ */ new Set();
+    for (const raw of patch.allowedRoots) {
+      const value = cleanPath(raw, "allowedRoots", issues);
+      if (!value) {
+        continue;
+      }
+      if (value === path2.parse(value).root) {
+        issues.push({ field: "allowedRoots", message: `\u5141\u8BB8\u6839\u76EE\u5F55\u4E0D\u80FD\u662F\u6587\u4EF6\u7CFB\u7EDF\u6839\u76EE\u5F55: ${value}` });
+        continue;
+      }
+      if (seen.has(value)) {
+        continue;
+      }
+      seen.add(value);
+      let stat;
+      try {
+        stat = fs2.statSync(value);
+      } catch {
+        issues.push({ field: "allowedRoots", message: `\u5141\u8BB8\u6839\u76EE\u5F55\u4E0D\u5B58\u5728\u6216\u4E0D\u53EF\u8BBF\u95EE: ${value}` });
+        continue;
+      }
+      if (!stat.isDirectory()) {
+        issues.push({ field: "allowedRoots", message: `\u5141\u8BB8\u6839\u76EE\u5F55\u5FC5\u987B\u662F\u76EE\u5F55: ${value}` });
+        continue;
+      }
+      roots.push(value);
+    }
+    if (roots.length === 0) {
+      issues.push({ field: "allowedRoots", message: "allowedRoots \u81F3\u5C11\u8981\u5305\u542B\u4E00\u4E2A\u5DF2\u5B58\u5728\u7684\u76EE\u5F55" });
+    } else {
+      normalized.allowedRoots = roots;
+      checks.allowedRoots = `\u5DF2\u786E\u8BA4 ${roots.length} \u4E2A\u76EE\u5F55`;
+    }
+  }
+  if (patch.java !== void 0) {
+    const value = stripControl(patch.java, "java", issues);
+    if (value) {
+      normalized.java = value;
+      if (value.includes("/") || value.includes("\\")) {
+        const status = checkFile(value, "java", "Java \u53EF\u6267\u884C\u6587\u4EF6", issues);
+        if (status) {
+          checks.java = status;
+        }
+      } else {
+        checks.java = "\u4F7F\u7528 PATH \u4E2D\u7684\u547D\u4EE4";
+      }
+    }
+  }
+  if (patch.logLevel !== void 0) {
+    if (patch.logLevel === "error" || patch.logLevel === "info" || patch.logLevel === "debug") {
+      normalized.logLevel = patch.logLevel;
+    } else {
+      issues.push({ field: "logLevel", message: `\u65E5\u5FD7\u7EA7\u522B\u975E\u6CD5: ${String(patch.logLevel)}\uFF08\u53EF\u9009 error / info / debug\uFF09` });
+    }
+  }
+  return { patch: normalized, issues, checks };
 }
-function requireFile(filePath, envName) {
-  let stat;
+function writeUserConfig(userConfigPath, patch) {
+  fs2.mkdirSync(path2.dirname(userConfigPath), { recursive: true });
+  let raw = null;
   try {
-    stat = fs.statSync(filePath);
+    raw = fs2.readFileSync(userConfigPath, "utf8");
   } catch (error62) {
-    const reason = error62 instanceof Error ? error62.message : String(error62);
-    throw new ConfigError(`${envName} \u6307\u5411\u7684\u8DEF\u5F84\u4E0D\u53EF\u8BBF\u95EE: ${filePath}`, reason);
+    if (!isNotFound(error62)) {
+      throw new ConfigError(`\u65E0\u6CD5\u8BFB\u53D6\u7528\u6237\u914D\u7F6E\u6587\u4EF6: ${userConfigPath}`, describeError2(error62));
+    }
   }
-  if (!stat.isFile()) {
-    throw new ConfigError(`${envName} \u5FC5\u987B\u6307\u5411\u4E00\u4E2A\u6587\u4EF6: ${filePath}`);
+  let existing = {};
+  if (raw !== null && raw.trim()) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        existing = parsed;
+      }
+    } catch {
+      existing = {};
+    }
+  }
+  const next = { version: 1, ...existing };
+  for (const [key, value] of Object.entries(patch)) {
+    if (value !== void 0) {
+      next[key] = value;
+    }
+  }
+  let backupPath = null;
+  if (raw !== null) {
+    const stamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
+    backupPath = `${userConfigPath}.bak-${stamp}`;
+    fs2.copyFileSync(userConfigPath, backupPath);
+  }
+  const tmpPath = `${userConfigPath}.tmp-${process.pid}-${Date.now()}`;
+  fs2.writeFileSync(tmpPath, `${JSON.stringify(next, null, 2)}
+`, { encoding: "utf8", mode: 384 });
+  fs2.renameSync(tmpPath, userConfigPath);
+  return { backupPath, written: next };
+}
+var ConfigStore = class {
+  constructor(env = process.env, userConfigPath = resolveUserConfigPath(env)) {
+    this.env = env;
+    this.userConfigPath = userConfigPath;
+    this.stamp = fileStamp(userConfigPath);
+    this.state = resolveConfig(env, userConfigPath);
+  }
+  env;
+  state;
+  stamp;
+  userConfigPath;
+  getState() {
+    const stamp = fileStamp(this.userConfigPath);
+    if (stamp !== this.stamp) {
+      this.stamp = stamp;
+      this.state = resolveConfig(this.env, this.userConfigPath);
+    }
+    return this.state;
+  }
+  current() {
+    return this.getState().config;
+  }
+  reload() {
+    this.stamp = fileStamp(this.userConfigPath);
+    this.state = resolveConfig(this.env, this.userConfigPath);
+    return this.state;
+  }
+};
+var StaticConfigStore = class {
+  constructor(config2) {
+    this.config = config2;
+  }
+  config;
+  userConfigPath = "";
+  getState() {
+    return {
+      config: this.config,
+      error: null,
+      sources: {},
+      userConfigPath: "",
+      userConfig: null,
+      userConfigError: null,
+      issues: []
+    };
+  }
+  current() {
+    return this.config;
+  }
+  reload() {
+    return this.getState();
+  }
+};
+function readUserConfigFile(userConfigPath) {
+  let text;
+  try {
+    text = fs2.readFileSync(userConfigPath, "utf8");
+  } catch (error62) {
+    if (isNotFound(error62)) {
+      return { value: null, error: null };
+    }
+    return { value: null, error: `\u65E0\u6CD5\u8BFB\u53D6\u7528\u6237\u914D\u7F6E\u6587\u4EF6 ${userConfigPath}: ${describeError2(error62)}` };
+  }
+  if (!text.trim()) {
+    return { value: null, error: null };
+  }
+  try {
+    const parsed = JSON.parse(text);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return { value: null, error: `\u7528\u6237\u914D\u7F6E\u6587\u4EF6\u5FC5\u987B\u662F JSON \u5BF9\u8C61: ${userConfigPath}` };
+    }
+    return { value: parsed, error: null };
+  } catch (error62) {
+    return { value: null, error: `\u7528\u6237\u914D\u7F6E\u6587\u4EF6 JSON \u89E3\u6790\u5931\u8D25: ${describeError2(error62)}` };
   }
 }
-function parseLogLevel(raw) {
-  const value = (raw ?? "").trim().toLowerCase();
-  if (!value) {
-    return "info";
+function stringValue(value, field, issues) {
+  if (value === void 0 || value === null) {
+    return null;
+  }
+  if (typeof value !== "string") {
+    issues.push({ field, message: `${field} \u5FC5\u987B\u662F\u5B57\u7B26\u4E32` });
+    return null;
+  }
+  return stripControl(value, field, issues);
+}
+function arrayValue(value, field, issues) {
+  if (value === void 0 || value === null) {
+    return null;
+  }
+  if (typeof value === "string") {
+    return value.trim() ? [value.trim()] : [];
+  }
+  if (!Array.isArray(value)) {
+    issues.push({ field, message: `${field} \u5FC5\u987B\u662F\u5B57\u7B26\u4E32\u6570\u7EC4` });
+    return null;
+  }
+  const roots = [];
+  for (const item of value) {
+    if (typeof item !== "string") {
+      issues.push({ field, message: `${field} \u5FC5\u987B\u662F\u5B57\u7B26\u4E32\u6570\u7EC4` });
+      return null;
+    }
+    const trimmed = item.trim();
+    if (trimmed) {
+      roots.push(trimmed);
+    }
+  }
+  return roots;
+}
+function logLevelValue(value, field, issues) {
+  if (value === void 0 || value === null) {
+    return null;
   }
   if (value === "error" || value === "info" || value === "debug") {
     return value;
   }
-  throw new ConfigError(
-    `${ENV_LOG_LEVEL} \u53D6\u503C\u975E\u6CD5: ${value}`,
-    "\u53EF\u9009\u503C: error / info / debug\uFF08\u9ED8\u8BA4 info\uFF09"
-  );
+  issues.push({ field, message: `${field} \u53D6\u503C\u975E\u6CD5: ${String(value)}\uFF08\u53EF\u9009 error / info / debug\uFF09` });
+  return null;
+}
+function parseLogLevelSoft(raw, issues) {
+  if (!raw) {
+    return null;
+  }
+  const value = raw.toLowerCase();
+  if (value === "error" || value === "info" || value === "debug") {
+    return value;
+  }
+  issues.push({ field: "logLevel", message: `${ENV_LOG_LEVEL} \u53D6\u503C\u975E\u6CD5: ${raw}\uFF08\u53EF\u9009 error / info / debug\uFF09` });
+  return null;
+}
+function envString(env, name) {
+  const value = (env[name] ?? "").trim();
+  if (!value || value.includes("${")) {
+    return null;
+  }
+  return value;
+}
+function splitRoots(raw) {
+  if (!raw) {
+    return [];
+  }
+  return raw.split(path2.delimiter).map((entry) => entry.trim()).filter((entry) => entry.length > 0);
+}
+function mavenRepoValue(raw, issues) {
+  const value = stripControl(raw, "cliMavenRepo", issues);
+  if (!value) {
+    return null;
+  }
+  let url2;
+  try {
+    url2 = new URL(value);
+  } catch {
+    issues.push({ field: "cliMavenRepo", message: `Maven \u4ED3\u5E93\u5730\u5740\u975E\u6CD5: ${value}` });
+    return null;
+  }
+  if (url2.protocol !== "http:" && url2.protocol !== "https:") {
+    issues.push({ field: "cliMavenRepo", message: `Maven \u4ED3\u5E93\u5730\u5740\u5FC5\u987B\u662F http/https: ${value}` });
+    return null;
+  }
+  if (url2.username || url2.password) {
+    issues.push({
+      field: "cliMavenRepo",
+      message: "Maven \u4ED3\u5E93\u5730\u5740\u4E0D\u80FD\u5305\u542B\u8D26\u53F7\u5BC6\u7801\uFF1B\u51ED\u636E\u8BF7\u914D\u7F6E\u5728 Maven settings.xml \u6216\u7F51\u7EDC\u5C42"
+    });
+    return null;
+  }
+  return value.replace(/\/+$/, "");
+}
+function mavenCoordinateValue(raw, issues) {
+  const value = stripControl(raw, "cliMavenCoordinate", issues);
+  if (!value) {
+    return null;
+  }
+  if (!parseMavenCoordinate(value)) {
+    issues.push({
+      field: "cliMavenCoordinate",
+      message: `Maven \u5750\u6807\u975E\u6CD5: ${value}\uFF08\u683C\u5F0F groupId:artifactId:version[:classifier]\uFF0C\u4E0D\u652F\u6301 SNAPSHOT\uFF09`
+    });
+    return null;
+  }
+  return value;
+}
+function cleanPath(raw, field, issues) {
+  const value = stripControl(raw, field, issues);
+  if (!value) {
+    return null;
+  }
+  if (!path2.isAbsolute(value)) {
+    issues.push({ field, message: `${field} \u5FC5\u987B\u662F\u7EDD\u5BF9\u8DEF\u5F84: ${value}` });
+    return null;
+  }
+  return path2.normalize(value);
+}
+function stripControl(raw, field, issues) {
+  const value = raw.trim();
+  if (!value) {
+    issues.push({ field, message: `${field} \u4E0D\u80FD\u4E3A\u7A7A` });
+    return null;
+  }
+  if (value.includes("\0") || /[\r\n]/.test(value)) {
+    issues.push({ field, message: `${field} \u4E0D\u80FD\u5305\u542B\u6362\u884C\u6216\u7A7A\u5B57\u7B26` });
+    return null;
+  }
+  if (/^eyJ[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(value) || /^Bearer\s+/i.test(value)) {
+    issues.push({ field, message: `${field} \u7591\u4F3C Token\uFF0CToken \u53EA\u80FD\u901A\u8FC7\u73AF\u5883\u53D8\u91CF ${ENV_TOKEN} \u63D0\u4F9B` });
+    return null;
+  }
+  return value;
+}
+function checkFile(filePath, field, label, issues) {
+  let stat;
+  try {
+    stat = fs2.statSync(filePath);
+  } catch (error62) {
+    issues.push({ field, message: `${label} \u8DEF\u5F84\u4E0D\u53EF\u8BBF\u95EE: ${filePath}\uFF08${describeError2(error62)}\uFF09` });
+    return null;
+  }
+  if (!stat.isFile()) {
+    issues.push({ field, message: `${label} \u5FC5\u987B\u6307\u5411\u4E00\u4E2A\u6587\u4EF6: ${filePath}` });
+    return null;
+  }
+  return "\u6587\u4EF6\u5B58\u5728";
+}
+function buildHint(issues) {
+  const details = issues.map((issue2) => issue2.message).join("\uFF1B");
+  return `${details}\u3002\u53EF\u8C03\u7528 i18n_config_get \u67E5\u770B\u5F53\u524D\u914D\u7F6E\uFF0C\u518D\u7528 i18n_config_set \u4FEE\u6539\uFF0C\u6216\u5728 Qoder \u4E2D\u6267\u884C /i18n-config\u3002`;
+}
+function fileStamp(filePath) {
+  try {
+    const stat = fs2.statSync(filePath);
+    return `${stat.mtimeMs}:${stat.size}`;
+  } catch {
+    return "missing";
+  }
+}
+function isNotFound(error62) {
+  return typeof error62 === "object" && error62 !== null && error62.code === "ENOENT";
+}
+function describeError2(error62) {
+  return error62 instanceof Error ? error62.message : String(error62);
 }
 
 // src/logger.ts
@@ -29119,8 +29832,8 @@ function getErrorMap2() {
 
 // node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
-  const { data, path: path2, errorMaps, issueData } = params;
-  const fullPath = [...path2, ...issueData.path || []];
+  const { data, path: path3, errorMaps, issueData } = params;
+  const fullPath = [...path3, ...issueData.path || []];
   const fullIssue = {
     ...issueData,
     path: fullPath
@@ -29175,15 +29888,15 @@ var ParseStatus = class _ParseStatus {
       this.value = "aborted";
   }
   static mergeArray(status, results) {
-    const arrayValue = [];
+    const arrayValue2 = [];
     for (const s of results) {
       if (s.status === "aborted")
         return INVALID2;
       if (s.status === "dirty")
         status.dirty();
-      arrayValue.push(s.value);
+      arrayValue2.push(s.value);
     }
-    return { status: status.value, value: arrayValue };
+    return { status: status.value, value: arrayValue2 };
   }
   static async mergeObjectAsync(status, pairs) {
     const syncPairs = [];
@@ -29235,11 +29948,11 @@ var errorUtil;
 
 // node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
-  constructor(parent, value, path2, key) {
+  constructor(parent, value, path3, key) {
     this._cachedPath = [];
     this.parent = parent;
     this.data = value;
-    this._path = path2;
+    this._path = path3;
     this._key = key;
   }
   get path() {
@@ -32790,11 +33503,11 @@ function normalizeObjectSchema(schema) {
   }
   return void 0;
 }
-function getDotPath(path2) {
-  if (path2.length === 0) {
+function getDotPath(path3) {
+  if (path3.length === 0) {
     return "object root";
   }
-  return path2.reduce((acc, seg, index) => {
+  return path3.reduce((acc, seg, index) => {
     if (index === 0) {
       return String(seg);
     }
@@ -34226,8 +34939,8 @@ var Protocol = class {
     this._taskStore = _options?.taskStore;
     this._taskMessageQueue = _options?.taskMessageQueue;
     if (this._taskStore) {
-      this.setRequestHandler(GetTaskRequestSchema, async (request, extra) => {
-        const task = await this._taskStore.getTask(request.params.taskId, extra.sessionId);
+      this.setRequestHandler(GetTaskRequestSchema, async (request2, extra) => {
+        const task = await this._taskStore.getTask(request2.params.taskId, extra.sessionId);
         if (!task) {
           throw new McpError(ErrorCode.InvalidParams, "Failed to retrieve task: Task not found");
         }
@@ -34235,9 +34948,9 @@ var Protocol = class {
           ...task
         };
       });
-      this.setRequestHandler(GetTaskPayloadRequestSchema, async (request, extra) => {
+      this.setRequestHandler(GetTaskPayloadRequestSchema, async (request2, extra) => {
         const handleTaskResult = async () => {
-          const taskId = request.params.taskId;
+          const taskId = request2.params.taskId;
           if (!await this._taskStore.getTask(taskId, extra.sessionId)) {
             throw new McpError(ErrorCode.InvalidParams, `Task not found: ${taskId}`);
           }
@@ -34291,9 +35004,9 @@ var Protocol = class {
         };
         return await handleTaskResult();
       });
-      this.setRequestHandler(ListTasksRequestSchema, async (request, extra) => {
+      this.setRequestHandler(ListTasksRequestSchema, async (request2, extra) => {
         try {
-          const { tasks, nextCursor } = await this._taskStore.listTasks(request.params?.cursor, extra.sessionId);
+          const { tasks, nextCursor } = await this._taskStore.listTasks(request2.params?.cursor, extra.sessionId);
           return {
             tasks,
             nextCursor,
@@ -34303,20 +35016,20 @@ var Protocol = class {
           throw new McpError(ErrorCode.InvalidParams, `Failed to list tasks: ${error62 instanceof Error ? error62.message : String(error62)}`);
         }
       });
-      this.setRequestHandler(CancelTaskRequestSchema, async (request, extra) => {
+      this.setRequestHandler(CancelTaskRequestSchema, async (request2, extra) => {
         try {
-          const task = await this._taskStore.getTask(request.params.taskId, extra.sessionId);
+          const task = await this._taskStore.getTask(request2.params.taskId, extra.sessionId);
           if (!task) {
-            throw new McpError(ErrorCode.InvalidParams, `Task not found: ${request.params.taskId}`);
+            throw new McpError(ErrorCode.InvalidParams, `Task not found: ${request2.params.taskId}`);
           }
           if (isTerminal(task.status)) {
             throw new McpError(ErrorCode.InvalidParams, `Cannot cancel task in terminal status: ${task.status}`);
           }
-          await this._taskStore.updateTaskStatus(request.params.taskId, "cancelled", "Client cancelled task execution.", extra.sessionId);
-          this._clearTaskQueue(request.params.taskId, extra.sessionId);
-          const cancelledTask = await this._taskStore.getTask(request.params.taskId, extra.sessionId);
+          await this._taskStore.updateTaskStatus(request2.params.taskId, "cancelled", "Client cancelled task execution.", extra.sessionId);
+          this._clearTaskQueue(request2.params.taskId, extra.sessionId);
+          const cancelledTask = await this._taskStore.getTask(request2.params.taskId, extra.sessionId);
           if (!cancelledTask) {
-            throw new McpError(ErrorCode.InvalidParams, `Task not found after cancellation: ${request.params.taskId}`);
+            throw new McpError(ErrorCode.InvalidParams, `Task not found after cancellation: ${request2.params.taskId}`);
           }
           return {
             _meta: {},
@@ -34437,10 +35150,10 @@ var Protocol = class {
     }
     Promise.resolve().then(() => handler(notification)).catch((error62) => this._onerror(new Error(`Uncaught error in notification handler: ${error62}`)));
   }
-  _onrequest(request, extra) {
-    const handler = this._requestHandlers.get(request.method) ?? this.fallbackRequestHandler;
+  _onrequest(request2, extra) {
+    const handler = this._requestHandlers.get(request2.method) ?? this.fallbackRequestHandler;
     const capturedTransport = this._transport;
-    const relatedTaskId = request.params?._meta?.[RELATED_TASK_META_KEY]?.taskId;
+    const relatedTaskId = request2.params?._meta?.[RELATED_TASK_META_KEY]?.taskId;
     const sessionId = capturedTransport?.sessionId;
     const store = this._taskStore;
     let relatedTaskFound = true;
@@ -34457,7 +35170,7 @@ var Protocol = class {
     if (handler === void 0) {
       const errorResponse = {
         jsonrpc: "2.0",
-        id: request.id,
+        id: request2.id,
         error: {
           code: ErrorCode.MethodNotFound,
           message: "Method not found"
@@ -34478,17 +35191,17 @@ var Protocol = class {
       return;
     }
     const abortController = new AbortController();
-    this._requestHandlerAbortControllers.set(request.id, abortController);
-    const taskCreationParams = isTaskAugmentedRequestParams(request.params) ? request.params.task : void 0;
-    const taskStore = this._taskStore ? this.requestTaskStore(request, capturedTransport?.sessionId) : void 0;
+    this._requestHandlerAbortControllers.set(request2.id, abortController);
+    const taskCreationParams = isTaskAugmentedRequestParams(request2.params) ? request2.params.task : void 0;
+    const taskStore = this._taskStore ? this.requestTaskStore(request2, capturedTransport?.sessionId) : void 0;
     const fullExtra = {
       signal: abortController.signal,
       sessionId: capturedTransport?.sessionId,
-      _meta: request.params?._meta,
+      _meta: request2.params?._meta,
       sendNotification: async (notification) => {
         if (abortController.signal.aborted)
           return;
-        const notificationOptions = { relatedRequestId: request.id };
+        const notificationOptions = { relatedRequestId: request2.id };
         if (relatedTaskId) {
           notificationOptions.relatedTask = { taskId: relatedTaskId };
         }
@@ -34498,7 +35211,7 @@ var Protocol = class {
         if (abortController.signal.aborted) {
           throw new McpError(ErrorCode.ConnectionClosed, "Request was cancelled");
         }
-        const requestOptions = { ...options, relatedRequestId: request.id };
+        const requestOptions = { ...options, relatedRequestId: request2.id };
         if (relatedTaskId && !requestOptions.relatedTask) {
           requestOptions.relatedTask = { taskId: relatedTaskId };
         }
@@ -34509,7 +35222,7 @@ var Protocol = class {
         return await this.request(r, resultSchema, requestOptions);
       },
       authInfo: extra?.authInfo,
-      requestId: request.id,
+      requestId: request2.id,
       requestInfo: extra?.requestInfo,
       taskId: relatedTaskId,
       taskStore,
@@ -34522,16 +35235,16 @@ var Protocol = class {
         throw new McpError(ErrorCode.ConnectionClosed, "Request was cancelled");
       }
       if (taskCreationParams) {
-        this.assertTaskHandlerCapability(request.method);
+        this.assertTaskHandlerCapability(request2.method);
       }
-    }).then(() => handler(request, fullExtra)).then(async (result) => {
+    }).then(() => handler(request2, fullExtra)).then(async (result) => {
       if (abortController.signal.aborted) {
         return;
       }
       const response = {
         result,
         jsonrpc: "2.0",
-        id: request.id
+        id: request2.id
       };
       if (relatedTaskId && this._taskMessageQueue) {
         await this._enqueueTaskMessage(relatedTaskId, {
@@ -34548,7 +35261,7 @@ var Protocol = class {
       }
       const errorResponse = {
         jsonrpc: "2.0",
-        id: request.id,
+        id: request2.id,
         error: {
           code: Number.isSafeInteger(error62["code"]) ? error62["code"] : ErrorCode.InternalError,
           message: error62.message ?? "Internal error",
@@ -34565,8 +35278,8 @@ var Protocol = class {
         await capturedTransport?.send(errorResponse);
       }
     }).catch((error62) => this._onerror(new Error(`Failed to send response: ${error62}`))).finally(() => {
-      if (this._requestHandlerAbortControllers.get(request.id) === abortController) {
-        this._requestHandlerAbortControllers.delete(request.id);
+      if (this._requestHandlerAbortControllers.get(request2.id) === abortController) {
+        this._requestHandlerAbortControllers.delete(request2.id);
       }
     });
   }
@@ -34670,11 +35383,11 @@ var Protocol = class {
    *
    * @experimental Use `client.experimental.tasks.requestStream()` to access this method.
    */
-  async *requestStream(request, resultSchema, options) {
+  async *requestStream(request2, resultSchema, options) {
     const { task } = options ?? {};
     if (!task) {
       try {
-        const result = await this.request(request, resultSchema, options);
+        const result = await this.request(request2, resultSchema, options);
         yield { type: "result", result };
       } catch (error62) {
         yield {
@@ -34686,7 +35399,7 @@ var Protocol = class {
     }
     let taskId;
     try {
-      const createResult = await this.request(request, CreateTaskResultSchema, options);
+      const createResult = await this.request(request2, CreateTaskResultSchema, options);
       if (createResult.task) {
         taskId = createResult.task.taskId;
         yield { type: "taskCreated", task: createResult.task };
@@ -34719,7 +35432,7 @@ var Protocol = class {
           return;
         }
         const pollInterval = task2.pollInterval ?? this._options?.defaultTaskPollInterval ?? 1e3;
-        await new Promise((resolve) => setTimeout(resolve, pollInterval));
+        await new Promise((resolve3) => setTimeout(resolve3, pollInterval));
         options?.signal?.throwIfAborted();
       }
     } catch (error62) {
@@ -34734,9 +35447,9 @@ var Protocol = class {
    *
    * Do not use this method to emit notifications! Use notification() instead.
    */
-  request(request, resultSchema, options) {
+  request(request2, resultSchema, options) {
     const { relatedRequestId, resumptionToken, onresumptiontoken, task, relatedTask } = options ?? {};
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve3, reject) => {
       const earlyReject = (error62) => {
         reject(error62);
       };
@@ -34746,9 +35459,9 @@ var Protocol = class {
       }
       if (this._options?.enforceStrictCapabilities === true) {
         try {
-          this.assertCapabilityForMethod(request.method);
+          this.assertCapabilityForMethod(request2.method);
           if (task) {
-            this.assertTaskCapability(request.method);
+            this.assertTaskCapability(request2.method);
           }
         } catch (e) {
           earlyReject(e);
@@ -34758,16 +35471,16 @@ var Protocol = class {
       options?.signal?.throwIfAborted();
       const messageId = this._requestMessageId++;
       const jsonrpcRequest = {
-        ...request,
+        ...request2,
         jsonrpc: "2.0",
         id: messageId
       };
       if (options?.onprogress) {
         this._progressHandlers.set(messageId, options.onprogress);
         jsonrpcRequest.params = {
-          ...request.params,
+          ...request2.params,
           _meta: {
-            ...request.params?._meta || {},
+            ...request2.params?._meta || {},
             progressToken: messageId
           }
         };
@@ -34814,7 +35527,7 @@ var Protocol = class {
           if (!parseResult.success) {
             reject(parseResult.error);
           } else {
-            resolve(parseResult.data);
+            resolve3(parseResult.data);
           }
         } catch (error62) {
           reject(error62);
@@ -34971,8 +35684,8 @@ var Protocol = class {
   setRequestHandler(requestSchema, handler) {
     const method = getMethodLiteral(requestSchema);
     this.assertRequestHandlerCapability(method);
-    this._requestHandlers.set(method, (request, extra) => {
-      const parsed = parseWithCompat(requestSchema, request);
+    this._requestHandlers.set(method, (request2, extra) => {
+      const parsed = parseWithCompat(requestSchema, request2);
       return Promise.resolve(handler(parsed, extra));
     });
   }
@@ -35076,31 +35789,31 @@ var Protocol = class {
       }
     } catch {
     }
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve3, reject) => {
       if (signal.aborted) {
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
         return;
       }
-      const timeoutId = setTimeout(resolve, interval);
+      const timeoutId = setTimeout(resolve3, interval);
       signal.addEventListener("abort", () => {
         clearTimeout(timeoutId);
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
       }, { once: true });
     });
   }
-  requestTaskStore(request, sessionId) {
+  requestTaskStore(request2, sessionId) {
     const taskStore = this._taskStore;
     if (!taskStore) {
       throw new Error("No task store configured");
     }
     return {
       createTask: async (taskParams) => {
-        if (!request) {
+        if (!request2) {
           throw new Error("No request provided");
         }
-        return await taskStore.createTask(taskParams, request.id, {
-          method: request.method,
-          params: request.params
+        return await taskStore.createTask(taskParams, request2.id, {
+          method: request2.method,
+          params: request2.params
         }, sessionId);
       },
       getTask: async (taskId) => {
@@ -35261,8 +35974,8 @@ var ExperimentalServerTasks = class {
    *
    * @experimental
    */
-  requestStream(request, resultSchema, options) {
-    return this._server.requestStream(request, resultSchema, options);
+  requestStream(request2, resultSchema, options) {
+    return this._server.requestStream(request2, resultSchema, options);
   }
   /**
    * Sends a sampling request and returns an AsyncGenerator that yields response messages.
@@ -35507,12 +36220,12 @@ var Server = class extends Protocol {
     this._capabilities = options?.capabilities ?? {};
     this._instructions = options?.instructions;
     this._jsonSchemaValidator = options?.jsonSchemaValidator ?? new AjvJsonSchemaValidator();
-    this.setRequestHandler(InitializeRequestSchema, (request) => this._oninitialize(request));
+    this.setRequestHandler(InitializeRequestSchema, (request2) => this._oninitialize(request2));
     this.setNotificationHandler(InitializedNotificationSchema, () => this.oninitialized?.());
     if (this._capabilities.logging) {
-      this.setRequestHandler(SetLevelRequestSchema, async (request, extra) => {
+      this.setRequestHandler(SetLevelRequestSchema, async (request2, extra) => {
         const transportSessionId = extra.sessionId || extra.requestInfo?.headers["mcp-session-id"] || void 0;
-        const { level } = request.params;
+        const { level } = request2.params;
         const parseResult = LoggingLevelSchema.safeParse(level);
         if (parseResult.success) {
           this._loggingLevels.set(transportSessionId, parseResult.data);
@@ -35562,14 +36275,14 @@ var Server = class extends Protocol {
     }
     const method = methodValue;
     if (method === "tools/call") {
-      const wrappedHandler = async (request, extra) => {
-        const validatedRequest = safeParse3(CallToolRequestSchema, request);
+      const wrappedHandler = async (request2, extra) => {
+        const validatedRequest = safeParse3(CallToolRequestSchema, request2);
         if (!validatedRequest.success) {
           const errorMessage = validatedRequest.error instanceof Error ? validatedRequest.error.message : String(validatedRequest.error);
           throw new McpError(ErrorCode.InvalidParams, `Invalid tools/call request: ${errorMessage}`);
         }
         const { params } = validatedRequest.data;
-        const result = await Promise.resolve(handler(request, extra));
+        const result = await Promise.resolve(handler(request2, extra));
         if (params.task) {
           const taskValidationResult = safeParse3(CreateTaskResultSchema, result);
           if (!taskValidationResult.success) {
@@ -35700,10 +36413,10 @@ var Server = class extends Protocol {
     }
     assertToolsCallTaskCapability(this._capabilities.tasks?.requests, method, "Server");
   }
-  async _oninitialize(request) {
-    const requestedVersion = request.params.protocolVersion;
-    this._clientCapabilities = request.params.capabilities;
-    this._clientVersion = request.params.clientInfo;
+  async _oninitialize(request2) {
+    const requestedVersion = request2.params.protocolVersion;
+    this._clientCapabilities = request2.params.capabilities;
+    this._clientVersion = request2.params.clientInfo;
     const protocolVersion = SUPPORTED_PROTOCOL_VERSIONS.includes(requestedVersion) ? requestedVersion : LATEST_PROTOCOL_VERSION;
     return {
       protocolVersion,
@@ -36076,33 +36789,33 @@ var McpServer = class {
         return toolDefinition;
       })
     }));
-    this.server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
+    this.server.setRequestHandler(CallToolRequestSchema, async (request2, extra) => {
       try {
-        const tool = this._registeredTools[request.params.name];
+        const tool = this._registeredTools[request2.params.name];
         if (!tool) {
-          throw new McpError(ErrorCode.InvalidParams, `Tool ${request.params.name} not found`);
+          throw new McpError(ErrorCode.InvalidParams, `Tool ${request2.params.name} not found`);
         }
         if (!tool.enabled) {
-          throw new McpError(ErrorCode.InvalidParams, `Tool ${request.params.name} disabled`);
+          throw new McpError(ErrorCode.InvalidParams, `Tool ${request2.params.name} disabled`);
         }
-        const isTaskRequest = !!request.params.task;
+        const isTaskRequest = !!request2.params.task;
         const taskSupport = tool.execution?.taskSupport;
         const isTaskHandler = "createTask" in tool.handler;
         if ((taskSupport === "required" || taskSupport === "optional") && !isTaskHandler) {
-          throw new McpError(ErrorCode.InternalError, `Tool ${request.params.name} has taskSupport '${taskSupport}' but was not registered with registerToolTask`);
+          throw new McpError(ErrorCode.InternalError, `Tool ${request2.params.name} has taskSupport '${taskSupport}' but was not registered with registerToolTask`);
         }
         if (taskSupport === "required" && !isTaskRequest) {
-          throw new McpError(ErrorCode.MethodNotFound, `Tool ${request.params.name} requires task augmentation (taskSupport: 'required')`);
+          throw new McpError(ErrorCode.MethodNotFound, `Tool ${request2.params.name} requires task augmentation (taskSupport: 'required')`);
         }
         if (taskSupport === "optional" && !isTaskRequest && isTaskHandler) {
-          return await this.handleAutomaticTaskPolling(tool, request, extra);
+          return await this.handleAutomaticTaskPolling(tool, request2, extra);
         }
-        const args = await this.validateToolInput(tool, request.params.arguments, request.params.name);
+        const args = await this.validateToolInput(tool, request2.params.arguments, request2.params.name);
         const result = await this.executeToolHandler(tool, args, extra);
         if (isTaskRequest) {
           return result;
         }
-        await this.validateToolOutput(tool, result, request.params.name);
+        await this.validateToolOutput(tool, result, request2.params.name);
         return result;
       } catch (error62) {
         if (error62 instanceof McpError) {
@@ -36206,11 +36919,11 @@ var McpServer = class {
   /**
    * Handles automatic task polling for tools with taskSupport 'optional'.
    */
-  async handleAutomaticTaskPolling(tool, request, extra) {
+  async handleAutomaticTaskPolling(tool, request2, extra) {
     if (!extra.taskStore) {
       throw new Error("No task store provided for task-capable tool.");
     }
-    const args = await this.validateToolInput(tool, request.params.arguments, request.params.name);
+    const args = await this.validateToolInput(tool, request2.params.arguments, request2.params.name);
     const handler = tool.handler;
     const taskExtra = { ...extra, taskStore: extra.taskStore };
     const createTaskResult = args ? await Promise.resolve(handler.createTask(args, taskExtra)) : (
@@ -36221,7 +36934,7 @@ var McpServer = class {
     let task = createTaskResult.task;
     const pollInterval = task.pollInterval ?? 5e3;
     while (task.status !== "completed" && task.status !== "failed" && task.status !== "cancelled") {
-      await new Promise((resolve) => setTimeout(resolve, pollInterval));
+      await new Promise((resolve3) => setTimeout(resolve3, pollInterval));
       const updatedTask = await extra.taskStore.getTask(taskId);
       if (!updatedTask) {
         throw new McpError(ErrorCode.InternalError, `Task ${taskId} not found during polling`);
@@ -36238,21 +36951,21 @@ var McpServer = class {
     this.server.registerCapabilities({
       completions: {}
     });
-    this.server.setRequestHandler(CompleteRequestSchema, async (request) => {
-      switch (request.params.ref.type) {
+    this.server.setRequestHandler(CompleteRequestSchema, async (request2) => {
+      switch (request2.params.ref.type) {
         case "ref/prompt":
-          assertCompleteRequestPrompt(request);
-          return this.handlePromptCompletion(request, request.params.ref);
+          assertCompleteRequestPrompt(request2);
+          return this.handlePromptCompletion(request2, request2.params.ref);
         case "ref/resource":
-          assertCompleteRequestResourceTemplate(request);
-          return this.handleResourceCompletion(request, request.params.ref);
+          assertCompleteRequestResourceTemplate(request2);
+          return this.handleResourceCompletion(request2, request2.params.ref);
         default:
-          throw new McpError(ErrorCode.InvalidParams, `Invalid completion reference: ${request.params.ref}`);
+          throw new McpError(ErrorCode.InvalidParams, `Invalid completion reference: ${request2.params.ref}`);
       }
     });
     this._completionHandlerInitialized = true;
   }
-  async handlePromptCompletion(request, ref) {
+  async handlePromptCompletion(request2, ref) {
     const prompt = this._registeredPrompts[ref.name];
     if (!prompt) {
       throw new McpError(ErrorCode.InvalidParams, `Prompt ${ref.name} not found`);
@@ -36264,7 +36977,7 @@ var McpServer = class {
       return EMPTY_COMPLETION_RESULT;
     }
     const promptShape = getObjectShape(prompt.argsSchema);
-    const field = promptShape?.[request.params.argument.name];
+    const field = promptShape?.[request2.params.argument.name];
     if (!isCompletable(field)) {
       return EMPTY_COMPLETION_RESULT;
     }
@@ -36272,22 +36985,22 @@ var McpServer = class {
     if (!completer) {
       return EMPTY_COMPLETION_RESULT;
     }
-    const suggestions = await completer(request.params.argument.value, request.params.context);
+    const suggestions = await completer(request2.params.argument.value, request2.params.context);
     return createCompletionResult(suggestions);
   }
-  async handleResourceCompletion(request, ref) {
+  async handleResourceCompletion(request2, ref) {
     const template = Object.values(this._registeredResourceTemplates).find((t) => t.resourceTemplate.uriTemplate.toString() === ref.uri);
     if (!template) {
       if (this._registeredResources[ref.uri]) {
         return EMPTY_COMPLETION_RESULT;
       }
-      throw new McpError(ErrorCode.InvalidParams, `Resource template ${request.params.ref.uri} not found`);
+      throw new McpError(ErrorCode.InvalidParams, `Resource template ${request2.params.ref.uri} not found`);
     }
-    const completer = template.resourceTemplate.completeCallback(request.params.argument.name);
+    const completer = template.resourceTemplate.completeCallback(request2.params.argument.name);
     if (!completer) {
       return EMPTY_COMPLETION_RESULT;
     }
-    const suggestions = await completer(request.params.argument.value, request.params.context);
+    const suggestions = await completer(request2.params.argument.value, request2.params.context);
     return createCompletionResult(suggestions);
   }
   setResourceRequestHandlers() {
@@ -36302,7 +37015,7 @@ var McpServer = class {
         listChanged: true
       }
     });
-    this.server.setRequestHandler(ListResourcesRequestSchema, async (request, extra) => {
+    this.server.setRequestHandler(ListResourcesRequestSchema, async (request2, extra) => {
       const resources = Object.entries(this._registeredResources).filter(([_, resource]) => resource.enabled).map(([uri, resource]) => ({
         uri,
         name: resource.name,
@@ -36332,8 +37045,8 @@ var McpServer = class {
       }));
       return { resourceTemplates };
     });
-    this.server.setRequestHandler(ReadResourceRequestSchema, async (request, extra) => {
-      const uri = new URL(request.params.uri);
+    this.server.setRequestHandler(ReadResourceRequestSchema, async (request2, extra) => {
+      const uri = new URL(request2.params.uri);
       const resource = this._registeredResources[uri.toString()];
       if (resource) {
         if (!resource.enabled) {
@@ -36372,21 +37085,21 @@ var McpServer = class {
         };
       })
     }));
-    this.server.setRequestHandler(GetPromptRequestSchema, async (request, extra) => {
-      const prompt = this._registeredPrompts[request.params.name];
+    this.server.setRequestHandler(GetPromptRequestSchema, async (request2, extra) => {
+      const prompt = this._registeredPrompts[request2.params.name];
       if (!prompt) {
-        throw new McpError(ErrorCode.InvalidParams, `Prompt ${request.params.name} not found`);
+        throw new McpError(ErrorCode.InvalidParams, `Prompt ${request2.params.name} not found`);
       }
       if (!prompt.enabled) {
-        throw new McpError(ErrorCode.InvalidParams, `Prompt ${request.params.name} disabled`);
+        throw new McpError(ErrorCode.InvalidParams, `Prompt ${request2.params.name} disabled`);
       }
       if (prompt.argsSchema) {
         const argsObj = normalizeObjectSchema(prompt.argsSchema);
-        const parseResult = await safeParseAsync3(argsObj, request.params.arguments ?? {});
+        const parseResult = await safeParseAsync3(argsObj, request2.params.arguments ?? {});
         if (!parseResult.success) {
           const error62 = "error" in parseResult ? parseResult.error : "Unknown error";
           const errorMessage = getParseErrorMessage(error62);
-          throw new McpError(ErrorCode.InvalidParams, `Invalid arguments for prompt ${request.params.name}: ${errorMessage}`);
+          throw new McpError(ErrorCode.InvalidParams, `Invalid arguments for prompt ${request2.params.name}: ${errorMessage}`);
         }
         const args = parseResult.data;
         const cb = prompt.callback;
@@ -36791,65 +37504,33 @@ var EMPTY_COMPLETION_RESULT = {
 
 // src/cli.ts
 var import_node_child_process = require("node:child_process");
-
-// src/errors.ts
-var ToolError = class extends Error {
-  code;
-  hint;
-  retryable;
-  cliCode;
-  constructor(code, message, options = {}) {
-    super(message);
-    this.name = "ToolError";
-    this.code = code;
-    this.hint = options.hint ?? "";
-    this.retryable = options.retryable ?? false;
-    this.cliCode = options.cliCode ?? null;
-  }
-};
-function toToolError(error62) {
-  if (error62 instanceof ToolError) {
-    return error62;
-  }
-  const message = error62 instanceof Error ? error62.message : String(error62);
-  return new ToolError("InternalError", message);
-}
-function toolErrorFromResult(result, envelope) {
-  const cliError = envelope.error;
-  const message = cliError?.message ?? `CLI \u9000\u51FA\u7801 ${result.exitCode}`;
-  const options = {
-    hint: cliError?.hint ?? "",
-    retryable: cliError?.retryable ?? false,
-    cliCode: cliError?.code ?? null
-  };
-  switch (result.exitCode) {
-    case 2:
-      return new ToolError("InvalidParams", message, options);
-    case 3:
-      return new ToolError("UpstreamError", message, { ...options, retryable: cliError?.retryable ?? true });
-    case 4:
-      return new ToolError("ConfirmationRequired", message, options);
-    default:
-      return new ToolError("InternalError", message, options);
-  }
-}
-
-// src/cli.ts
 var STDOUT_LIMIT_BYTES = 64 * 1024 * 1024;
 var STDERR_LIMIT_BYTES = 512 * 1024;
 var CliRunner = class {
-  constructor(config2, logger) {
-    this.config = config2;
+  constructor(provider, logger, jarResolver) {
+    this.provider = provider;
     this.logger = logger;
+    this.jarResolver = jarResolver ?? new CliJarResolver(logger);
   }
-  config;
+  provider;
   logger;
+  jarResolver;
   async run(args, timeoutMs) {
-    const [bin, ...prefixArgs] = this.config.command;
+    const config2 = this.provider.current();
+    if (!config2) {
+      throw new ToolError("InternalError", "\u914D\u7F6E\u672A\u5C31\u7EEA\uFF0C\u65E0\u6CD5\u6267\u884C Java CLI", {
+        hint: "\u8C03\u7528 i18n_config_get \u67E5\u770B\u914D\u7F6E\uFF0C\u518D\u7528 i18n_config_set \u4FEE\u6539 jar / modules.yaml / \u5141\u8BB8\u6839\u76EE\u5F55",
+        cliCode: "CONFIG_INVALID"
+      });
+    }
+    if (config2.cliJarMode) {
+      await this.jarResolver.ensure(config2);
+    }
+    const [bin, ...prefixArgs] = config2.command;
     const argv = [...prefixArgs, ...args, "--json"];
     const startedAt = Date.now();
     this.logger.debug(`\u6267\u884C CLI: ${bin} ${argv.join(" ")}`);
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve3, reject) => {
       const child = (0, import_node_child_process.spawn)(bin, argv, {
         cwd: process.cwd(),
         env: process.env,
@@ -36944,7 +37625,7 @@ var CliRunner = class {
           if (exitCode !== 0 && envelope.error) {
             this.logger.info(`CLI \u5931\u8D25 exit=${exitCode} code=${envelope.error.code}: ${envelope.error.message}`);
           }
-          resolve({
+          resolve3({
             exitCode,
             envelope,
             warnings: envelope.warnings,
@@ -36990,8 +37671,8 @@ var ModuleLocks = class {
   async run(key, task) {
     const previous = this.tails.get(key) ?? Promise.resolve();
     let release;
-    const gate = new Promise((resolve) => {
-      release = resolve;
+    const gate = new Promise((resolve3) => {
+      release = resolve3;
     });
     const queued = previous.then(
       () => gate,
@@ -37030,15 +37711,15 @@ function registerPrompts(server) {
       description: "\u6309\u5B89\u5168\u68C0\u67E5\u987A\u5E8F\u5B8C\u6210\u4E00\u4E2A\u6A21\u5757\u7684\u72B6\u6001\u68C0\u67E5\u3001\u626B\u63CF\u3001\u5DEE\u5F02\u5206\u6790\u3001dry-run \u4E0E\u786E\u8BA4\u540E\u7684\u5199\u5165",
       argsSchema: syncModuleArgs
     },
-    ({ module: module2, os, languages }) => {
-      const target = os ? `${module2}\uFF08os=${os}\uFF09` : module2;
+    ({ module: module2, os: os3, languages }) => {
+      const target = os3 ? `${module2}\uFF08os=${os3}\uFF09` : module2;
       const languageHint = languages ? `\u53EA\u5904\u7406\u8BED\u8A00: ${languages}` : "\u4F7F\u7528\u914D\u7F6E\u4E2D\u7684\u5168\u90E8\u8BED\u8A00";
       const text = [
         `\u8BF7\u5BF9\u6A21\u5757 ${target} \u6267\u884C FLP \u591A\u8BED\u8A00\u540C\u6B65\uFF0C\u4E25\u683C\u6309\u4EE5\u4E0B\u987A\u5E8F\u64CD\u4F5C\uFF1A`,
         "",
         "1. \u8C03\u7528 i18n_status\uFF0C\u786E\u8BA4 configOk=true\u3001Token \u6709\u6548\u3001\u8FDC\u7AEF\u53EF\u8FBE\u3002\u82E5 Token \u7F3A\u5931/\u8FC7\u671F\u6216\u8FDC\u7AEF\u4E0D\u53EF\u8FBE\uFF0C\u505C\u6B62\u5E76\u62A5\u544A\uFF0C\u4E0D\u8981\u5C1D\u8BD5\u5199\u5165\u3002",
-        `2. \u8C03\u7528 i18n_scan\uFF08module=${module2}${os ? `, os=${os}` : ""}\uFF09\uFF0C\u68C0\u67E5 key \u6570\u91CF\u3001\u91CD\u590D\u4E0E\u7C7B\u52A0\u8F7D\u5931\u8D25\u3002`,
-        `3. \u8C03\u7528 i18n_diff\uFF08module=${module2}${os ? `, os=${os}` : ""}\uFF09\uFF0C\u67E5\u770B missingOnPlatform / missingLocally / zhConflicts / remoteUnavailable\u3002${languageHint}\u3002`,
+        `2. \u8C03\u7528 i18n_scan\uFF08module=${module2}${os3 ? `, os=${os3}` : ""}\uFF09\uFF0C\u68C0\u67E5 key \u6570\u91CF\u3001\u91CD\u590D\u4E0E\u7C7B\u52A0\u8F7D\u5931\u8D25\u3002`,
+        `3. \u8C03\u7528 i18n_diff\uFF08module=${module2}${os3 ? `, os=${os3}` : ""}\uFF09\uFF0C\u67E5\u770B missingOnPlatform / missingLocally / zhConflicts / remoteUnavailable\u3002${languageHint}\u3002`,
         "4. \u8C03\u7528 i18n_validate \u68C0\u67E5\u672C\u5730\u6587\u4EF6\u95EE\u9898\uFF1B\u6709 error \u65F6\u5148\u4FEE\u590D\u6216\u62A5\u544A\uFF0C\u4E0D\u8981\u76F2\u76EE\u5199\u5165\u3002",
         "5. \u4E0A\u4F20\u524D\u5148\u4EE5 dryRun=true \u8C03\u7528 i18n_upload\uFF0C\u4FDD\u5B58\u8FD4\u56DE\u7684 planId\uFF0C\u5E76\u5411\u7528\u6237\u5C55\u793A\uFF1A\u5F71\u54CD\u6A21\u5757\u3001\u6761\u76EE\u6570\u3001\u793A\u4F8B key\u3001limit/rate-ms\u3002",
         "6. \u53EA\u6709\u7528\u6237\u660E\u786E\u540C\u610F\u540E\uFF0C\u624D\u7528\u5B8C\u5168\u76F8\u540C\u7684 planId \u548C dryRun=false \u518D\u6B21\u8C03\u7528 i18n_upload\u3002",
@@ -37072,7 +37753,7 @@ var ReportStore = class {
 };
 
 // src/resources.ts
-var fs2 = __toESM(require("node:fs/promises"));
+var fs3 = __toESM(require("node:fs/promises"));
 function registerResources(server, deps) {
   server.registerResource(
     "i18n-modules",
@@ -37083,12 +37764,16 @@ function registerResources(server, deps) {
       mimeType: "text/yaml"
     },
     async (uri) => {
+      const config2 = deps.store.getState().config;
+      if (!config2) {
+        throw new Error("\u914D\u7F6E\u672A\u5C31\u7EEA\uFF0C\u8BF7\u5148\u8C03\u7528 i18n_config_get / i18n_config_set \u5B8C\u6210\u914D\u7F6E");
+      }
       let text;
       try {
-        text = await fs2.readFile(deps.config.configPath, "utf8");
+        text = await fs3.readFile(config2.configPath, "utf8");
       } catch (error62) {
         const message = error62 instanceof Error ? error62.message : String(error62);
-        throw new Error(`\u65E0\u6CD5\u8BFB\u53D6\u914D\u7F6E\u6587\u4EF6 ${deps.config.configPath}: ${message}`);
+        throw new Error(`\u65E0\u6CD5\u8BFB\u53D6\u914D\u7F6E\u6587\u4EF6 ${config2.configPath}: ${message}`);
       }
       return {
         contents: [{ uri: uri.href, mimeType: "text/yaml", text: deps.redact(text) }]
@@ -37122,6 +37807,9 @@ function registerResources(server, deps) {
   );
 }
 
+// src/tools/config.ts
+var fs4 = __toESM(require("node:fs"));
+
 // src/schemas.ts
 var NAME_PATTERN = /^[A-Za-z0-9._-]+$/;
 var moduleNameSchema = external_exports.string().min(1).max(128).regex(NAME_PATTERN, "\u6A21\u5757\u540D\u53EA\u80FD\u5305\u542B\u5B57\u6BCD\u3001\u6570\u5B57\u3001\u70B9\u3001\u4E0B\u5212\u7EBF\u548C\u77ED\u6A2A\u7EBF").describe("modules.yaml \u4E2D\u5B9A\u4E49\u7684\u6A21\u5757\u540D");
@@ -37152,6 +37840,21 @@ var uploadInput = {
   planId: planIdSchema.optional(),
   limit: external_exports.number().int().min(1).max(1e5).optional().describe("\u6700\u591A\u5904\u7406\u591A\u5C11\u6761\uFF08\u7528\u4E8E\u7070\u5EA6\uFF09"),
   rateMs: external_exports.number().int().min(0).max(6e4).optional().describe("\u6BCF\u6B21\u4FDD\u5B58\u4E4B\u95F4\u7684\u95F4\u9694\u6BEB\u79D2\u6570")
+};
+var configGetInput = {};
+var pathSchema = external_exports.string().min(1).max(4096).describe("\u7EDD\u5BF9\u8DEF\u5F84\uFF1B\u4E0D\u5141\u8BB8\u5305\u542B\u6362\u884C\u6216\u7A7A\u5B57\u7B26");
+var configSetInput = {
+  cliJar: external_exports.string().max(4096).optional().describe("flp-i18n-cli.jar \u7684\u7EDD\u5BF9\u8DEF\u5F84\uFF1B\u4F20\u7A7A\u5B57\u7B26\u4E32\u5219\u5FFD\u7565\u672C\u5730 jar \u4E0E FLP_I18N_CLI_JAR\uFF0C\u6539\u7528 Maven \u81EA\u52A8\u4E0B\u8F7D"),
+  cliMavenRepo: external_exports.string().min(8).max(4096).regex(/^https?:\/\/[^\s]+$/i, "Maven \u4ED3\u5E93\u5FC5\u987B\u662F http/https \u5730\u5740").optional().describe("Maven \u4ED3\u5E93\u6839\u5730\u5740\uFF0C\u4F8B\u5982 https://registry.example.com/repository/maven-public/"),
+  cliMavenCoordinate: external_exports.string().min(5).max(512).regex(
+    /^[A-Za-z0-9_.-]+:[A-Za-z0-9_.-]+:[A-Za-z0-9_.-]+(?::[A-Za-z0-9_.-]+)?$/,
+    "\u5750\u6807\u683C\u5F0F groupId:artifactId:version[:classifier]"
+  ).optional().describe("Maven \u5750\u6807\uFF0C\u4F8B\u5982 com.flashfin:flp-i18n-tool:0.1.0"),
+  configFile: pathSchema.optional().describe("modules.yaml \u7684\u7EDD\u5BF9\u8DEF\u5F84"),
+  allowedRoots: external_exports.array(pathSchema).min(1).max(20).optional().describe("\u5141\u8BB8\u8BBF\u95EE\u7684\u4ED3\u5E93\u6839\u76EE\u5F55\u5217\u8868\uFF08\u7EDD\u5BF9\u8DEF\u5F84\uFF0C\u5FC5\u987B\u662F\u5DF2\u5B58\u5728\u7684\u76EE\u5F55\uFF09"),
+  java: external_exports.string().min(1).max(1024).optional().describe("Java \u53EF\u6267\u884C\u6587\u4EF6\u8DEF\u5F84\u6216 PATH \u4E2D\u7684\u547D\u4EE4\u540D"),
+  logLevel: external_exports.enum(["error", "info", "debug"]).optional().describe("\u65E5\u5FD7\u7EA7\u522B"),
+  dryRun: external_exports.boolean().default(true).describe("true\uFF08\u9ED8\u8BA4\uFF09= \u53EA\u6821\u9A8C\u5E76\u9884\u89C8\uFF0C\u4E0D\u5199\u914D\u7F6E\u6587\u4EF6\uFF1Bfalse = \u5199\u5165\u7528\u6237\u914D\u7F6E\u6587\u4EF6")
 };
 var downloadInput = {
   module: moduleNameSchema,
@@ -37190,6 +37893,15 @@ function errorResult(error62, envelope = null) {
   );
 }
 async function runCliTool(deps, options) {
+  const state = deps.store.getState();
+  if (!state.config) {
+    return errorResult(
+      new ToolError("InternalError", `\u914D\u7F6E\u672A\u5C31\u7EEA: ${state.error?.message ?? "\u7F3A\u5C11\u5FC5\u9700\u914D\u7F6E"}`, {
+        hint: state.error?.hint || "\u8C03\u7528 i18n_config_get \u67E5\u770B\u5F53\u524D\u914D\u7F6E\uFF0C\u518D\u7528 i18n_config_set \u4FEE\u6539 jar / modules.yaml / \u5141\u8BB8\u6839\u76EE\u5F55\uFF0C\u6216\u6267\u884C /i18n-config",
+        cliCode: "CONFIG_INVALID"
+      })
+    );
+  }
   try {
     const result = await deps.runner.run([options.command, ...options.args], options.timeoutMs);
     const envelope = result.envelope;
@@ -37235,10 +37947,10 @@ function validateWriteRequest(dryRun, planId) {
   }
   return null;
 }
-function buildWriteArgs(module2, os, dryRun, planId) {
+function buildWriteArgs(module2, os3, dryRun, planId) {
   const args = ["--module", module2];
-  if (os) {
-    args.push("--os", os);
+  if (os3) {
+    args.push("--os", os3);
   }
   if (!dryRun && planId) {
     args.push("--apply", "--plan-id", planId);
@@ -37247,6 +37959,138 @@ function buildWriteArgs(module2, os, dryRun, planId) {
 }
 function moduleLockKey(module2) {
   return module2;
+}
+
+// src/tools/config.ts
+function registerConfigTools(server, deps) {
+  server.registerTool(
+    "i18n_config_get",
+    {
+      title: "\u67E5\u770B I18n \u914D\u7F6E",
+      description: "\u67E5\u770B\u5F53\u524D\u751F\u6548\u7684 jar\u3001Maven \u4ED3\u5E93/\u5750\u6807\u3001modules.yaml\u3001\u5141\u8BB8\u6839\u76EE\u5F55\u3001Java \u4E0E\u65E5\u5FD7\u7EA7\u522B\uFF0C\u5E76\u6807\u6CE8\u6BCF\u4E2A\u503C\u7684\u6765\u6E90\uFF08\u7528\u6237\u914D\u7F6E\u6587\u4EF6 / \u73AF\u5883\u53D8\u91CF / \u9ED8\u8BA4\u503C\uFF09\u4E0E\u6821\u9A8C\u7ED3\u679C\u3002jar \u672A\u663E\u5F0F\u914D\u7F6E\u65F6\u6309 Maven \u5750\u6807\u4ECE\u4ED3\u5E93\u4E0B\u8F7D\u5E76\u7F13\u5B58\u3002\u4E0D\u6253\u5370 Token\u3002",
+      inputSchema: configGetInput,
+      annotations: { readOnlyHint: true }
+    },
+    async () => textResult(describeConfig(deps.store.getState()))
+  );
+  server.registerTool(
+    "i18n_config_set",
+    {
+      title: "\u4FEE\u6539 I18n \u914D\u7F6E",
+      description: "\u6821\u9A8C\u5E76\u5199\u5165\u7528\u6237\u914D\u7F6E\u6587\u4EF6\uFF08\u9ED8\u8BA4 dryRun=true \u53EA\u9884\u89C8\uFF09\u3002\u53EF\u4FEE\u6539 cliJar / cliMavenRepo / cliMavenCoordinate / configFile / allowedRoots / java / logLevel\uFF1B\u7559\u7A7A cliJar \u65F6\u6309 Maven \u5750\u6807\u81EA\u52A8\u4E0B\u8F7D\u3002\u4FDD\u5B58\u540E\u7ACB\u5373\u751F\u6548\uFF0C\u65E0\u9700\u91CD\u542F MCP Server\u3002\u4E0D\u4F1A\u5199\u5165 Token\uFF0C\u4E5F\u4E0D\u4F1A\u4FEE\u6539\u4E1A\u52A1\u4ED3\u5E93\u3002",
+      inputSchema: configSetInput,
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true }
+    },
+    async (input2) => {
+      if (!deps.store.userConfigPath) {
+        return errorResult(
+          new ToolError("InternalError", "\u5F53\u524D MCP Server \u672A\u542F\u7528\u7528\u6237\u914D\u7F6E\u6587\u4EF6", {
+            hint: "\u8BE5 Server \u4EE5\u9759\u6001\u6D4B\u8BD5\u914D\u7F6E\u542F\u52A8\uFF0C\u65E0\u6CD5\u5199\u5165\u7528\u6237\u914D\u7F6E",
+            cliCode: "CONFIG_READONLY"
+          })
+        );
+      }
+      const patch = {};
+      if (input2.cliJar !== void 0) {
+        patch.cliJar = input2.cliJar;
+      }
+      if (input2.cliMavenRepo !== void 0) {
+        patch.cliMavenRepo = input2.cliMavenRepo;
+      }
+      if (input2.cliMavenCoordinate !== void 0) {
+        patch.cliMavenCoordinate = input2.cliMavenCoordinate;
+      }
+      if (input2.configFile !== void 0) {
+        patch.configFile = input2.configFile;
+      }
+      if (input2.allowedRoots !== void 0) {
+        patch.allowedRoots = input2.allowedRoots;
+      }
+      if (input2.java !== void 0) {
+        patch.java = input2.java;
+      }
+      if (input2.logLevel !== void 0) {
+        patch.logLevel = input2.logLevel;
+      }
+      if (Object.keys(patch).length === 0) {
+        return errorResult(
+          new ToolError("InvalidParams", "\u81F3\u5C11\u63D0\u4F9B\u4E00\u4E2A\u914D\u7F6E\u9879", {
+            hint: "\u53EF\u4F20 cliJar / cliMavenRepo / cliMavenCoordinate / configFile / allowedRoots / java / logLevel",
+            cliCode: "CONFIG_EMPTY_PATCH"
+          })
+        );
+      }
+      const { patch: normalized, issues, checks } = validateUserConfigPatch(patch);
+      if (issues.length > 0) {
+        return errorResult(
+          new ToolError("InvalidParams", `\u914D\u7F6E\u6821\u9A8C\u5931\u8D25: ${issues[0].message}`, {
+            hint: issues.map((issue2) => issue2.message).join("\uFF1B"),
+            cliCode: "CONFIG_INVALID"
+          })
+        );
+      }
+      const dryRun = input2.dryRun !== false;
+      if (dryRun) {
+        return textResult({
+          ok: true,
+          dryRun: true,
+          userConfigPath: deps.store.userConfigPath,
+          patch: normalized,
+          checks,
+          effective: summarizeConfig(deps.store.getState())
+        });
+      }
+      const { backupPath } = writeUserConfig(deps.store.userConfigPath, normalized);
+      const state = deps.store.reload();
+      return textResult({
+        ok: true,
+        dryRun: false,
+        userConfigPath: deps.store.userConfigPath,
+        patch: normalized,
+        checks,
+        backupPath,
+        effective: summarizeConfig(state)
+      });
+    }
+  );
+}
+function describeConfig(state) {
+  return {
+    ok: state.config !== null,
+    userConfigPath: state.userConfigPath,
+    userConfigExists: exists(state.userConfigPath),
+    userConfigError: state.userConfigError,
+    effective: summarizeConfig(state),
+    error: state.error ? { message: state.error.message, hint: state.error.hint } : null
+  };
+}
+function summarizeConfig(state) {
+  const config2 = state.config;
+  return {
+    ready: config2 !== null,
+    values: config2 ? {
+      cliJar: config2.cliJar ?? config2.command[2] ?? null,
+      cliJarMode: config2.cliJarMode ?? "path",
+      cliJarCached: config2.cliJar ? exists(config2.cliJar) : false,
+      cliMavenRepo: config2.cliMavenRepo ?? null,
+      cliMavenCoordinate: config2.cliMavenCoordinate ?? null,
+      cacheDir: config2.cacheDir ?? null,
+      configFile: config2.configPath,
+      allowedRoots: config2.allowedRoots,
+      java: config2.command[0],
+      logLevel: config2.logLevel,
+      token: { present: config2.token !== null }
+    } : null,
+    sources: state.sources,
+    issues: state.issues
+  };
+}
+function exists(filePath) {
+  try {
+    return fs4.statSync(filePath).isFile();
+  } catch {
+    return false;
+  }
 }
 
 // src/tools/diff.ts
@@ -37259,10 +38103,10 @@ function registerDiffTool(server, deps) {
       inputSchema: diffInput,
       annotations: { readOnlyHint: true, openWorldHint: true }
     },
-    async ({ module: module2, os, languages }) => {
+    async ({ module: module2, os: os3, languages }) => {
       const args = ["--module", module2];
-      if (os) {
-        args.push("--os", os);
+      if (os3) {
+        args.push("--os", os3);
       }
       if (languages && languages.length > 0) {
         args.push("--languages", languages.join(","));
@@ -37272,7 +38116,7 @@ function registerDiffTool(server, deps) {
         args,
         timeoutMs: deps.config.readTimeoutMs,
         module: module2,
-        os,
+        os: os3,
         record: true
       });
     }
@@ -37289,12 +38133,12 @@ function registerDownloadTool(server, deps) {
       inputSchema: downloadInput,
       annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: true }
     },
-    async ({ module: module2, os, languages, dryRun, planId }) => {
+    async ({ module: module2, os: os3, languages, dryRun, planId }) => {
       const invalid = validateWriteRequest(dryRun, planId);
       if (invalid) {
         return errorResult(invalid);
       }
-      const args = buildWriteArgs(module2, os, dryRun, planId);
+      const args = buildWriteArgs(module2, os3, dryRun, planId);
       if (languages && languages.length > 0) {
         args.push("--languages", languages.join(","));
       }
@@ -37305,7 +38149,7 @@ function registerDownloadTool(server, deps) {
           args,
           timeoutMs: deps.config.writeTimeoutMs,
           module: module2,
-          os,
+          os: os3,
           record: true
         })
       );
@@ -37323,17 +38167,17 @@ function registerScanTool(server, deps) {
       inputSchema: scanInput,
       annotations: { readOnlyHint: true, openWorldHint: true }
     },
-    async ({ module: module2, os }) => {
+    async ({ module: module2, os: os3 }) => {
       const args = ["--module", module2];
-      if (os) {
-        args.push("--os", os);
+      if (os3) {
+        args.push("--os", os3);
       }
       return runCliTool(deps, {
         command: "scan",
         args,
         timeoutMs: deps.config.readTimeoutMs,
         module: module2,
-        os,
+        os: os3,
         record: true
       });
     }
@@ -37369,12 +38213,12 @@ function registerUploadTool(server, deps) {
       inputSchema: uploadInput,
       annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: true }
     },
-    async ({ module: module2, os, dryRun, planId, limit, rateMs }) => {
+    async ({ module: module2, os: os3, dryRun, planId, limit, rateMs }) => {
       const invalid = validateWriteRequest(dryRun, planId);
       if (invalid) {
         return errorResult(invalid);
       }
-      const args = buildWriteArgs(module2, os, dryRun, planId);
+      const args = buildWriteArgs(module2, os3, dryRun, planId);
       if (limit !== void 0) {
         args.push("--limit", String(limit));
       }
@@ -37388,7 +38232,7 @@ function registerUploadTool(server, deps) {
           args,
           timeoutMs: deps.config.writeTimeoutMs,
           module: module2,
-          os,
+          os: os3,
           record: true
         })
       );
@@ -37406,17 +38250,17 @@ function registerValidateTool(server, deps) {
       inputSchema: validateInput,
       annotations: { readOnlyHint: true, openWorldHint: true }
     },
-    async ({ module: module2, os }) => {
+    async ({ module: module2, os: os3 }) => {
       const args = ["--module", module2];
-      if (os) {
-        args.push("--os", os);
+      if (os3) {
+        args.push("--os", os3);
       }
       return runCliTool(deps, {
         command: "validate",
         args,
         timeoutMs: deps.config.readTimeoutMs,
         module: module2,
-        os,
+        os: os3,
         record: true
       });
     }
@@ -37425,6 +38269,7 @@ function registerValidateTool(server, deps) {
 
 // src/tools/index.ts
 function registerTools(server, deps) {
+  registerConfigTools(server, deps);
   registerStatusTool(server, deps);
   registerScanTool(server, deps);
   registerDiffTool(server, deps);
@@ -37435,13 +38280,32 @@ function registerTools(server, deps) {
 
 // src/server.ts
 var SERVER_NAME = "flp-i18n-mcp";
-var SERVER_VERSION = "0.1.0";
+var SERVER_VERSION = "0.1.4";
 function createServer(config2, overrides = {}) {
-  const redact = overrides.redact ?? createRedactor([config2.token]);
-  const logger = overrides.logger ?? new Logger(config2.logLevel, redact);
+  const provider = isConfigProvider(config2) ? config2 : new StaticConfigStore(config2);
+  const initialState = provider.getState();
+  const redact = overrides.redact ?? createRedactor([initialState.config?.token ?? null, process.env.FLP_I18N_TOKEN ?? null]);
+  const logger = overrides.logger ?? new Logger(initialState.config?.logLevel ?? "info", redact);
+  const fallbackConfig = {
+    command: [],
+    configPath: "",
+    allowedRoots: [],
+    token: null,
+    logLevel: "info",
+    readTimeoutMs: READ_TIMEOUT_MS,
+    writeTimeoutMs: WRITE_TIMEOUT_MS,
+    cliJar: null,
+    cliJarMode: "path",
+    cliMavenRepo: null,
+    cliMavenCoordinate: null,
+    cacheDir: ""
+  };
   const deps = {
-    config: config2,
-    runner: overrides.runner ?? new CliRunner(config2, logger),
+    store: provider,
+    get config() {
+      return provider.getState().config ?? fallbackConfig;
+    },
+    runner: overrides.runner ?? new CliRunner(provider, logger),
     logger,
     reports: overrides.reports ?? new ReportStore(),
     locks: overrides.locks ?? new ModuleLocks(),
@@ -37450,7 +38314,7 @@ function createServer(config2, overrides = {}) {
   const server = new McpServer(
     { name: SERVER_NAME, version: SERVER_VERSION },
     {
-      instructions: "FLP \u591A\u8BED\u8A00\u540C\u6B65\u5DE5\u5177\u3002\u8BFB\u5DE5\u5177\uFF1Ai18n_status / i18n_scan / i18n_diff / i18n_validate\u3002\u5199\u5DE5\u5177\uFF1Ai18n_upload / i18n_download\uFF0C\u9ED8\u8BA4 dryRun=true\uFF0C\u5199\u5165\u5FC5\u987B\u643A\u5E26 dryRun \u8FD4\u56DE\u7684 planId \u5E76\u5728\u7528\u6237\u786E\u8BA4\u540E\u4EE5 dryRun=false \u6267\u884C\u3002"
+      instructions: "FLP \u591A\u8BED\u8A00\u540C\u6B65\u5DE5\u5177\u3002\u914D\u7F6E\u5DE5\u5177\uFF1Ai18n_config_get / i18n_config_set\uFF08jar\u3001modules.yaml\u3001\u5141\u8BB8\u6839\u76EE\u5F55\uFF09\u3002\u8BFB\u5DE5\u5177\uFF1Ai18n_status / i18n_scan / i18n_diff / i18n_validate\u3002\u5199\u5DE5\u5177\uFF1Ai18n_upload / i18n_download\uFF0C\u9ED8\u8BA4 dryRun=true\uFF0C\u5199\u5165\u5FC5\u987B\u643A\u5E26 dryRun \u8FD4\u56DE\u7684 planId \u5E76\u5728\u7528\u6237\u786E\u8BA4\u540E\u4EE5 dryRun=false \u6267\u884C\u3002"
     }
   );
   registerTools(server, deps);
@@ -37458,28 +38322,30 @@ function createServer(config2, overrides = {}) {
   registerPrompts(server);
   return { server, deps };
 }
+function isConfigProvider(value) {
+  return typeof value.getState === "function";
+}
 
 // src/index.ts
 async function main() {
-  let config2;
-  try {
-    config2 = loadConfig();
-  } catch (error62) {
-    const message = error62 instanceof Error ? error62.message : String(error62);
-    const hint = error62 instanceof ConfigError ? error62.hint : "";
-    process.stderr.write(`[flp-i18n-mcp] ERROR \u542F\u52A8\u914D\u7F6E\u65E0\u6548: ${message}${hint ? `\uFF08${hint}\uFF09` : ""}
-`);
-    process.exit(1);
-  }
-  const redact = createRedactor([config2.token]);
-  const logger = new Logger(config2.logLevel, redact);
-  const { server } = createServer(config2, { logger, redact });
+  const store = new ConfigStore();
+  const state = store.getState();
+  const token = state.config?.token ?? null;
+  const redact = createRedactor([token, process.env.FLP_I18N_TOKEN ?? null]);
+  const logger = new Logger(state.config?.logLevel ?? "info", redact);
+  const { server } = createServer(store, { logger, redact });
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  logger.info(
-    `${SERVER_NAME} ${SERVER_VERSION} \u5DF2\u542F\u52A8\uFF08config=${config2.configPath}\uFF0CToken ${config2.token ? "\u5DF2\u914D\u7F6E" : "\u7F3A\u5931"}\uFF09`
-  );
-  if (!config2.token) {
+  if (state.config) {
+    logger.info(
+      `${SERVER_NAME} ${SERVER_VERSION} \u5DF2\u542F\u52A8\uFF08config=${state.config.configPath}\uFF0CToken ${state.config.token ? "\u5DF2\u914D\u7F6E" : "\u7F3A\u5931"}\uFF0C\u7528\u6237\u914D\u7F6E=${store.userConfigPath}\uFF09`
+    );
+  } else {
+    logger.error(
+      `${SERVER_NAME} ${SERVER_VERSION} \u5DF2\u542F\u52A8\uFF0C\u4F46\u914D\u7F6E\u672A\u5C31\u7EEA: ${state.error?.message ?? "\u7F3A\u5C11\u5FC5\u9700\u914D\u7F6E"}\uFF1B\u53EF\u8C03\u7528 i18n_config_get / i18n_config_set \u4FEE\u590D`
+    );
+  }
+  if (!token) {
     logger.error("\u672A\u68C0\u6D4B\u5230 FLP_I18N_TOKEN\uFF1Bstatus \u4ECD\u53EF\u7528\u4E8E\u8BCA\u65AD\uFF0Cdiff/upload/download \u5C06\u5931\u8D25");
   }
 }

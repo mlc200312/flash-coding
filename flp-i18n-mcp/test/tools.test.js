@@ -15,6 +15,8 @@ const {
 
 const PLAN_ID = "a".repeat(64);
 const CLI_TOOLS = [
+  "i18n_config_get",
+  "i18n_config_set",
   "i18n_diff",
   "i18n_download",
   "i18n_scan",
@@ -23,7 +25,7 @@ const CLI_TOOLS = [
   "i18n_validate",
 ];
 
-test("列出六个工具，写工具包含 dryRun 默认值与 planId", async () => {
+test("列出八个工具，写工具包含 dryRun 默认值与 planId", async () => {
   const config = makeConfig();
   const ctx = await startServer(config);
   try {

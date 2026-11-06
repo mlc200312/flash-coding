@@ -5,14 +5,18 @@ PROCESS_PATTERN="${FLP_I18N_QODER_PROCESS:-Qoder.app/Contents/MacOS/Qoder}"
 
 usage() {
   cat <<'EOF'
-用法: ./install.sh --jar <flp-i18n-cli.jar> --config <modules.yaml> [选项]
+用法: ./install.sh --config <modules.yaml> [选项]
 
 必填:
-  --jar PATH           flp-i18n-cli.jar 的绝对路径（也可用 FLP_I18N_CLI_JAR）
   --config PATH        modules.yaml 的绝对路径（也可用 FLP_I18N_CONFIG）
   --roots PATH         允许访问的仓库根目录，多个用 : 分隔（默认取 FLP_I18N_ALLOWED_ROOTS）
+                       安装后会写入用户配置文件，之后可在 Qoder 内用 /i18n-config 修改
 
 可选:
+  --jar PATH           flp-i18n-cli.jar 的绝对路径（也可用 FLP_I18N_CLI_JAR）
+                       省略时由 MCP Server 按 Maven 坐标自动下载并校验
+  --maven-repo URL     CLI jar 的 Maven 仓库根地址（省略时使用内置默认值）
+  --maven-coord COORD  CLI 坐标 groupId:artifactId:version（省略时使用内置默认值）
   --zip PATH           从 zip 安装；省略时使用本脚本所在目录（解压后的插件包）
   --qoder-home PATH    Qoder 数据目录，默认 ~/.qoder（也可用 QODER_HOME）
   --no-register        只落盘，不写入 installed_plugins_v2.json / settings.json
@@ -20,9 +24,9 @@ usage() {
   -h, --help           显示帮助
 
 示例:
+  ./install.sh --config ~/flp-i18n-tool/modules.yaml --roots ~/repos
   ./install.sh --jar ~/flp-i18n-tool/target/flp-i18n-cli.jar \
-               --config ~/flp-i18n-tool/modules.yaml \
-               --roots ~/repos
+               --config ~/flp-i18n-tool/modules.yaml --roots ~/repos
 EOF
 }
 
@@ -34,6 +38,8 @@ die() {
 JAR="${FLP_I18N_CLI_JAR:-}"
 CONFIG="${FLP_I18N_CONFIG:-}"
 ROOTS="${FLP_I18N_ALLOWED_ROOTS:-}"
+MAVEN_REPO="${FLP_I18N_CLI_MAVEN_REPO:-}"
+MAVEN_COORD="${FLP_I18N_CLI_MAVEN_COORD:-}"
 ZIP=""
 QODER_HOME="${QODER_HOME:-$HOME/.qoder}"
 REGISTER=1
@@ -44,6 +50,8 @@ while [ $# -gt 0 ]; do
     --jar) JAR="$2"; shift 2 ;;
     --config) CONFIG="$2"; shift 2 ;;
     --roots) ROOTS="$2"; shift 2 ;;
+    --maven-repo) MAVEN_REPO="$2"; shift 2 ;;
+    --maven-coord) MAVEN_COORD="$2"; shift 2 ;;
     --zip) ZIP="$2"; shift 2 ;;
     --qoder-home) QODER_HOME="$2"; shift 2 ;;
     --no-register) REGISTER=0; shift ;;
@@ -53,19 +61,32 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-[ -n "$JAR" ] || die "缺少 --jar"
 [ -n "$CONFIG" ] || die "缺少 --config"
 [ -n "$ROOTS" ] || die "缺少 --roots"
-[ -f "$JAR" ] || die "jar 不存在: $JAR"
+if [ -n "$JAR" ]; then
+  [ -f "$JAR" ] || die "jar 不存在: $JAR"
+fi
 [ -f "$CONFIG" ] || die "配置不存在: $CONFIG"
-[ -d "$ROOTS" ] || die "允许根目录不存在: $ROOTS"
 [ -d "$QODER_HOME" ] || die "未找到 Qoder 数据目录: $QODER_HOME（请先安装并启动一次 Qoder，或用 --qoder-home 指定）"
 
 normalize() { (cd "$(dirname "$1")" && printf '%s/%s' "$(pwd)" "$(basename "$1")"); }
-JAR="$(normalize "$JAR")"
+if [ -n "$JAR" ]; then
+  JAR="$(normalize "$JAR")"
+fi
 CONFIG="$(normalize "$CONFIG")"
-ROOTS="$(cd "$ROOTS" && pwd)"
+
+ROOTS_LIST=""
+IFS=':' read -r -a _roots <<< "$ROOTS"
+for _root in "${_roots[@]}"; do
+  [ -n "$_root" ] || continue
+  [ -d "$_root" ] || die "允许根目录不存在: $_root"
+  _abs="$(cd "$_root" && pwd)"
+  ROOTS_LIST="${ROOTS_LIST:+$ROOTS_LIST:}$_abs"
+done
+[ -n "$ROOTS_LIST" ] || die "缺少有效的允许根目录"
+ROOTS="$ROOTS_LIST"
 QODER_HOME="$(cd "$QODER_HOME" && pwd)"
+USER_CONFIG="$QODER_HOME/plugins/data/flp-i18n-local/config.json"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WORK=""
@@ -114,7 +135,7 @@ import os
 import sys
 import tempfile
 
-mcp_path, reg_path, settings_path, jar, config, roots, version, dest, display, register = sys.argv[1:11]
+mcp_path, reg_path, settings_path, user_config_path, jar, config, roots, maven_repo, maven_coord, version, dest, display, register = sys.argv[1:14]
 
 
 def read(path, default):
@@ -138,10 +159,34 @@ def write(path, data):
 mcp = read(mcp_path, {"mcpServers": {}})
 for server in mcp.get("mcpServers", {}).values():
     server.setdefault("env", {})
-    server["env"]["FLP_I18N_CLI_JAR"] = jar
+    if jar:
+        server["env"]["FLP_I18N_CLI_JAR"] = jar
+    else:
+        server["env"].pop("FLP_I18N_CLI_JAR", None)
     server["env"]["FLP_I18N_CONFIG"] = config
     server["env"]["FLP_I18N_ALLOWED_ROOTS"] = roots
 write(mcp_path, mcp)
+
+roots_list = [entry for entry in roots.split(os.pathsep) if entry]
+try:
+    user_config = read(user_config_path, {})
+except (OSError, ValueError):
+    os.replace(user_config_path, user_config_path + ".bak-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+    user_config = {}
+if not isinstance(user_config, dict):
+    user_config = {}
+user_config["version"] = 1
+if jar:
+    user_config["cliJar"] = jar
+else:
+    user_config.pop("cliJar", None)
+if maven_repo:
+    user_config["cliMavenRepo"] = maven_repo
+if maven_coord:
+    user_config["cliMavenCoordinate"] = maven_coord
+user_config["configFile"] = config
+user_config["allowedRoots"] = roots_list
+write(user_config_path, user_config)
 
 if register != "1":
     sys.exit(0)
@@ -172,7 +217,8 @@ PY
   elif command -v node >/dev/null 2>&1; then
     node - "$@" <<'JS'
 const fs = require("fs");
-const [mcpPath, regPath, settingsPath, jar, config, roots, version, dest, display, register] = process.argv.slice(2);
+const path = require("path");
+const [mcpPath, regPath, settingsPath, userConfigPath, jar, config, roots, mavenRepo, mavenCoord, version, dest, display, register] = process.argv.slice(2);
 
 function read(path, fallback) {
   try {
@@ -191,14 +237,34 @@ function write(path, data) {
 
 const mcp = read(mcpPath, { mcpServers: {} });
 for (const server of Object.values(mcp.mcpServers || {})) {
-  server.env = {
-    ...(server.env || {}),
-    FLP_I18N_CLI_JAR: jar,
-    FLP_I18N_CONFIG: config,
-    FLP_I18N_ALLOWED_ROOTS: roots,
-  };
+  server.env = { ...(server.env || {}) };
+  if (jar) server.env.FLP_I18N_CLI_JAR = jar;
+  else delete server.env.FLP_I18N_CLI_JAR;
+  server.env.FLP_I18N_CONFIG = config;
+  server.env.FLP_I18N_ALLOWED_ROOTS = roots;
 }
 write(mcpPath, mcp);
+
+let userConfig = {};
+try {
+  userConfig = read(userConfigPath, {});
+} catch {
+  if (fs.existsSync(userConfigPath)) {
+    fs.renameSync(userConfigPath, `${userConfigPath}.bak-${new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "")}`);
+  }
+}
+const rootsList = roots.split(path.delimiter).filter(Boolean);
+const nextConfig = {
+  ...(userConfig && typeof userConfig === "object" ? userConfig : {}),
+  version: 1,
+  configFile: config,
+  allowedRoots: rootsList,
+};
+if (jar) nextConfig.cliJar = jar;
+else delete nextConfig.cliJar;
+if (mavenRepo) nextConfig.cliMavenRepo = mavenRepo;
+if (mavenCoord) nextConfig.cliMavenCoordinate = mavenCoord;
+write(userConfigPath, nextConfig);
 
 if (register !== "1") process.exit(0);
 
@@ -236,7 +302,7 @@ SETTINGS_PATH="$QODER_HOME/settings.json"
 if [ -f "$REG_PATH" ]; then cp "$REG_PATH" "$REG_PATH.bak-$STAMP"; fi
 if [ -f "$SETTINGS_PATH" ]; then cp "$SETTINGS_PATH" "$SETTINGS_PATH.bak-$STAMP"; fi
 
-json_patch "$DEST/.mcp.json" "$REG_PATH" "$SETTINGS_PATH" "$JAR" "$CONFIG" "$ROOTS" "$VERSION" "$DEST" "FLP 多语言同步" "$REGISTER"
+json_patch "$DEST/.mcp.json" "$REG_PATH" "$SETTINGS_PATH" "$USER_CONFIG" "$JAR" "$CONFIG" "$ROOTS" "$MAVEN_REPO" "$MAVEN_COORD" "$VERSION" "$DEST" "FLP 多语言同步" "$REGISTER"
 
 TOKEN_NOTE="未检测到 FLP_I18N_TOKEN，安装后需自行配置"
 if [ -n "${FLP_I18N_TOKEN:-}" ]; then
@@ -255,14 +321,18 @@ cat <<EOF
 安装完成
   版本      : $VERSION
   安装路径  : $DEST
-  CLI jar   : $JAR
+  CLI jar   : ${JAR:-Maven 自动下载（首次调用时）}
   配置      : $CONFIG
   允许根    : $ROOTS
+  用户配置  : $USER_CONFIG
   注册插件  : $([ "$REGISTER" -eq 1 ] && echo "已写入 Qoder 配置" || echo "已跳过（--no-register）")
   Token     : $TOKEN_NOTE
 
 下一步：完全退出并重新打开 Qoder，然后验证插件列表出现「FLP 多语言同步」，
-且可用 6 个 i18n_* MCP 工具与 /i18n-sync 命令。
+且可用 8 个 i18n_* MCP 工具与 /i18n-sync、/i18n-config 命令。
+
+后续修改配置：在 Qoder 中执行 /i18n-config，或让 Agent 调用 i18n_config_set；
+也可以直接编辑上面的「用户配置」文件（不会写入 Token）。
 
 回滚：将 $DEST 删除，并用 $REG_PATH.bak-$STAMP 与 $SETTINGS_PATH.bak-$STAMP 覆盖原文件。
 EOF

@@ -30,8 +30,9 @@ metadata:
 
 ## 前置条件
 
-1. MCP 工具 `i18n_status`、`i18n_scan`、`i18n_diff`、`i18n_validate`、`i18n_upload`、`i18n_download` 可见。
-2. 用户环境中已设置 `FLP_I18N_CLI_JAR`、`FLP_I18N_CONFIG`、`FLP_I18N_ALLOWED_ROOTS`、`FLP_I18N_TOKEN`。
+1. MCP 工具 `i18n_config_get`、`i18n_config_set`、`i18n_status`、`i18n_scan`、`i18n_diff`、`i18n_validate`、`i18n_upload`、`i18n_download` 可见。
+2. 已完成配置：`configFile`、`allowedRoots`（用户配置文件优先，环境变量兜底），以及环境变量 `FLP_I18N_TOKEN`。
+   `cliJar` 可选：未配置时由 MCP Server 按 Maven 坐标自动下载并校验；也可用 `cliMavenRepo` / `cliMavenCoordinate` 覆盖。
 3. Token 只能由用户通过环境变量配置。绝不能让用户在对话中粘贴 Token，也不要把它写进任何文件。
 
 如果工具不可见，说明插件 MCP Server 未启动：让用户检查 Qoder 的 MCP 配置与上述环境变量后重启 Qoder，不要改用 shell 直接调用 CLI。
@@ -43,6 +44,20 @@ metadata:
 - **key 类型**：错误码 `code_<code>`；枚举 `<EnumSimpleName>_<code>`。
 - **planId**：dry-run 返回的 64 位十六进制计划指纹。apply 时必须原样回传，计划变化会被拒绝（`PLAN_STALE`）。
 - **dryRun**：两个写工具都默认 `true`，只生成计划，不写平台、不写文件。
+
+## 配置
+
+配置由用户配置文件提供（路径见 `i18n_config_get` 返回的 `userConfigPath`），优先级高于环境变量；
+修改后立即生效，不需要重启 MCP Server。
+
+- `i18n_config_get`：查看有效值、来源（file / env / default）、校验问题与配置就绪状态。
+- `i18n_config_set`：修改 `cliJar` / `cliMavenRepo` / `cliMavenCoordinate` / `configFile` / `allowedRoots` / `java` / `logLevel`。
+  默认 `dryRun=true` 只预览；用户明确同意后传 `dryRun=false` 写入。只写用户配置文件，不碰业务仓库。
+- 用户说「配置不对」「jar 路径要改」「换一个 modules.yaml」时，优先走配置工具或 `/i18n-config`，
+  不要让用户手动改 `.mcp.json`，也不要直接修改已安装插件目录。
+- 未配置 `cliJar` 时 jar 按 Maven 自动下载；把 `cliJar` 设为空字符串会忽略 `FLP_I18N_CLI_JAR` 并强制使用 Maven。
+  遇到 `CLI_UNAVAILABLE` 时优先检查网络与 `cliMavenRepo` / `cliMavenCoordinate`，仍失败再让用户提供本地 jar。
+- 如果 `i18n_status` 等工具返回 `CONFIG_INVALID`，先调用 `i18n_config_get` 定位缺失项。
 
 ## 强制流程
 
@@ -78,6 +93,8 @@ metadata:
 
 | 工具 | 参数 |
 | --- | --- |
+| `i18n_config_get` | 无 |
+| `i18n_config_set` | `cliJar?`, `cliMavenRepo?`, `cliMavenCoordinate?`, `configFile?`, `allowedRoots?`, `java?`, `logLevel?`, `dryRun`（默认 true） |
 | `i18n_status` | 无 |
 | `i18n_scan` | `module`, `os?` |
 | `i18n_diff` | `module`, `os?`, `languages?`（数组） |
@@ -140,6 +157,7 @@ metadata:
 - 远端不可用、路径越界、工作区脏、Token 缺失/过期时立即停止，不自动重试写入。
 - 不覆盖中文冲突；冲突只报告，交由人工决策。
 - 不直接调用 `java -jar` 绕过 MCP 工具（用户明确要求排障除外）。
+- 不把 Token 写入用户配置文件；`i18n_config_set` 只接受路径、Maven 坐标与日志级别，拒绝疑似 Token 的值。
 - 不把下载结果描述为「已生效」；需要用户重新构建/部署后才生效。
 
 ## 失败处理
@@ -150,7 +168,10 @@ metadata:
 | `REMOTE_UNAVAILABLE`（retryable） | 报告不可用语言与 URL；可稍后重试只读检查，写操作需重新 dry-run |
 | `GIT_DIRTY` | 停止，让用户提交或 stash 后重新 dry-run；不得使用强制参数 |
 | `PLAN_STALE` | 计划已变化，重新 dry-run 并向用户重新确认 |
-| `PATH_NOT_ALLOWED` / `PATH_NOT_FOUND` | 配置或 `FLP_I18N_ALLOWED_ROOTS` 问题，停止并说明 |
+| `CONFIG_INVALID` | 调用 `i18n_config_get` 定位缺失/失效项，再让用户选择新值并用 `i18n_config_set` 修改 |
+| `PATH_NOT_ALLOWED` / `PATH_NOT_FOUND` | 配置或 `allowedRoots` 问题；检查配置后必要时用 `i18n_config_set` 补充根目录 |
+| `CLI_UNAVAILABLE` | 本地 jar 失效或 Maven 不可达；检查 `cliMavenRepo` / `cliMavenCoordinate`，必要时改用本地 `cliJar` |
+| `CLI_CHECKSUM_*` / `CLI_DOWNLOAD_FAILED` | Maven 下载或校验失败；确认仓库地址与网络，不要跳过校验 |
 | `CLI_BAD_OUTPUT` / `TIMEOUT` | 报告命令与耗时；检查 CLI jar 版本与网络，不要盲目重试写入 |
 | `InvalidParams` | 修正参数（module/os/languages/dryRun 组合）后重试 |
 

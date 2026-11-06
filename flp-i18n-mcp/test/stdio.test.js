@@ -45,6 +45,7 @@ test("stdio 集成：列出工具并调用 status/scan/diff，无 planId 的 upl
       FLP_I18N_CLI_JAR: jarPath,
       FLP_I18N_CONFIG: configPath,
       FLP_I18N_ALLOWED_ROOTS: tmpDir,
+      FLP_I18N_USER_CONFIG: path.join(tmpDir, "user-config.json"),
       FLP_I18N_TOKEN: "test-token-abc12345",
       FLP_I18N_LOG_LEVEL: "error",
       FAKE_CALL_LOG: callLog,
@@ -59,7 +60,16 @@ test("stdio 集成：列出工具并调用 status/scan/diff，无 planId 的 upl
     const { tools } = await client.listTools();
     assert.deepEqual(
       tools.map((tool) => tool.name).sort(),
-      ["i18n_diff", "i18n_download", "i18n_scan", "i18n_status", "i18n_upload", "i18n_validate"],
+      [
+        "i18n_config_get",
+        "i18n_config_set",
+        "i18n_diff",
+        "i18n_download",
+        "i18n_scan",
+        "i18n_status",
+        "i18n_upload",
+        "i18n_validate",
+      ],
     );
 
     const status = await client.callTool({ name: "i18n_status", arguments: {} });

@@ -1,14 +1,15 @@
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 import type { CliEnvelope, CliRunner } from "../cli";
-import type { ServerConfig } from "../config";
+import type { ConfigProvider, ServerConfig } from "../config";
 import { ToolError, toolErrorFromResult, toToolError } from "../errors";
 import type { Logger, Redactor } from "../logger";
 import type { ModuleLocks } from "../lock";
 import type { ReportStore } from "../report";
 
 export interface ToolDeps {
-  config: ServerConfig;
+  store: ConfigProvider;
+  readonly config: ServerConfig;
   runner: CliRunner;
   logger: Logger;
   reports: ReportStore;
@@ -56,6 +57,18 @@ export interface RunOptions {
 }
 
 export async function runCliTool(deps: ToolDeps, options: RunOptions): Promise<CallToolResult> {
+  const state = deps.store.getState();
+  if (!state.config) {
+    return errorResult(
+      new ToolError("InternalError", `配置未就绪: ${state.error?.message ?? "缺少必需配置"}`, {
+        hint:
+          state.error?.hint ||
+          "调用 i18n_config_get 查看当前配置，再用 i18n_config_set 修改 jar / modules.yaml / 允许根目录，或执行 /i18n-config",
+        cliCode: "CONFIG_INVALID",
+      }),
+    );
+  }
+
   try {
     const result = await deps.runner.run([options.command, ...options.args], options.timeoutMs);
     const envelope = result.envelope;

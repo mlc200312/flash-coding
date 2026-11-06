@@ -14,12 +14,16 @@ export function registerResources(server: McpServer, deps: ToolDeps): void {
       mimeType: "text/yaml",
     },
     async (uri) => {
+      const config = deps.store.getState().config;
+      if (!config) {
+        throw new Error("配置未就绪，请先调用 i18n_config_get / i18n_config_set 完成配置");
+      }
       let text: string;
       try {
-        text = await fs.readFile(deps.config.configPath, "utf8");
+        text = await fs.readFile(config.configPath, "utf8");
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        throw new Error(`无法读取配置文件 ${deps.config.configPath}: ${message}`);
+        throw new Error(`无法读取配置文件 ${config.configPath}: ${message}`);
       }
       return {
         contents: [{ uri: uri.href, mimeType: "text/yaml", text: deps.redact(text) }],

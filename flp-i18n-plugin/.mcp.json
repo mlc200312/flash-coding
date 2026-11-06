@@ -8,11 +8,15 @@
       "cwd": "${QODER_PLUGIN_ROOT}",
       "timeout": 600000,
       "env_vars": [
+        "FLP_I18N_TOKEN",
         "FLP_I18N_CLI_JAR",
-        "FLP_I18N_CONFIG",
-        "FLP_I18N_ALLOWED_ROOTS",
-        "FLP_I18N_TOKEN"
-      ]
+        "FLP_I18N_CLI_MAVEN_REPO",
+        "FLP_I18N_CLI_MAVEN_COORD",
+        "FLP_I18N_CACHE_DIR"
+      ],
+      "env": {
+        "FLP_I18N_USER_CONFIG": "${QODER_PLUGIN_DATA}/config.json"
+      }
     }
   }
 }

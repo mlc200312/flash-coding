@@ -6,7 +6,7 @@
 
     <groupId>com.flashfin</groupId>
     <artifactId>flp-i18n-tool</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
 
     <name>flp-i18n-tool</name>
@@ -40,6 +40,19 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>Flash Express Maven Releases</name>
+            <url>https://registry.flashexpress.pub/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Flash Express Maven Snapshots</name>
+            <url>https://registry.flashexpress.pub/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <finalName>flp-i18n-cli</finalName>

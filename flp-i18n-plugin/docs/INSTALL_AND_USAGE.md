@@ -1,6 +1,6 @@
 # FLP 多语言同步插件：安装与使用
 
-本文档对应插件 `flp-i18n@local` 0.1.2、MCP Server `flp-i18n-mcp` 0.1.0、Java CLI `flp-i18n-tool` 0.1.0。
+本文档对应插件 `flp-i18n@local` 0.1.4、MCP Server `flp-i18n-mcp` 0.1.4、Java CLI `flp-i18n-tool` 0.1.0。
 
 组件关系：
 
@@ -24,12 +24,12 @@ flp-i18n-tool（扫描、diff、validate、upload、download）
 | 条件 | 说明 |
 | --- | --- |
 | Java 8+ | CLI 运行在 Java 8，`java` 需在 Qoder 进程的 `PATH` 中 |
-| CLI jar | `flp-i18n-tool/target/flp-i18n-cli.jar` 已构建 |
+| CLI jar | 默认由 MCP Server 从 Maven 自动下载并校验；也可用 `cliJar` 指向本地 `flp-i18n-tool/target/flp-i18n-cli.jar` |
 | `modules.yaml` | 模块、仓库路径、语言、平台地址配置 |
 | 翻译平台 Token | 只通过 `FLP_I18N_TOKEN` 注入，不写入任何文件 |
 | Qoder Desktop | 通过 `${QODER_NODE_RUNTIME}` 提供 Node 运行时 |
 
-构建 CLI：
+可选：本地构建 CLI（需要固定本地版本时）：
 
 ```bash
 cd flp-i18n-tool
@@ -58,7 +58,7 @@ modules:
 ```
 
 路径语义：`workspaceRoot` 相对 `modules.yaml` 所在目录；`repoRoot` 相对 `workspaceRoot`；`domainPath` 相对 `repoRoot`。
-所有路径必须是已存在目录，且解析后不得越出 `FLP_I18N_ALLOWED_ROOTS`。
+所有路径必须是已存在目录，且解析后不得越出 `allowedRoots`（用户配置文件）或 `FLP_I18N_ALLOWED_ROOTS`。
 
 ---
 
@@ -70,7 +70,7 @@ modules:
 cd flp-i18n-plugin
 ./package.sh            # 便携包（默认），适合分发到其他机器
 ./package.sh --local    # 把本机路径写进 .mcp.json，适合在打包机上直接安装
-# 产物：dist/flp-i18n-plugin-0.1.2.zip
+# 产物：dist/flp-i18n-plugin-0.1.4.zip
 ```
 
 - **便携模式（默认）**：`.mcp.json` 的 `env` 写占位路径（`/absolute/path/to/...`），由安装脚本注入真实路径。
@@ -80,14 +80,25 @@ cd flp-i18n-plugin
 
 ### 2. 一键安装
 
-前置：目标机器已安装并启动过一次 Qoder，且准备了 Java 8+、`flp-i18n-cli.jar`、`modules.yaml` 和业务仓库。
+前置：目标机器已安装并启动过一次 Qoder，且准备了 Java 8+、`modules.yaml` 和业务仓库。
+CLI jar 可省略，由 MCP Server 首次调用时从 Maven 下载；需要固定本地 jar 时再传 `--jar` / `-Jar`。
 
 **macOS / Linux**
 
 ```bash
-unzip flp-i18n-plugin-0.1.2.zip -d flp-i18n-plugin
+unzip flp-i18n-plugin-0.1.4.zip -d flp-i18n-plugin
+./flp-i18n-plugin/install.sh \
+  --config /abs/path/modules.yaml \
+  --roots /abs/path/workspace
+```
+
+需要本地 jar 或自定义 Maven 源：
+
+```bash
 ./flp-i18n-plugin/install.sh \
   --jar /abs/path/flp-i18n-cli.jar \
+  --maven-repo https://registry.flashexpress.pub/repository/maven-public/ \
+  --maven-coord com.flashfin:flp-i18n-tool:0.1.0 \
   --config /abs/path/modules.yaml \
   --roots /abs/path/workspace
 ```
@@ -95,8 +106,7 @@ unzip flp-i18n-plugin-0.1.2.zip -d flp-i18n-plugin
 也可以不解压，直接指定 zip：
 
 ```bash
-./install.sh --zip flp-i18n-plugin-0.1.2.zip \
-  --jar /abs/path/flp-i18n-cli.jar \
+./install.sh --zip flp-i18n-plugin-0.1.4.zip \
   --config /abs/path/modules.yaml \
   --roots /abs/path/workspace
 ```
@@ -104,19 +114,22 @@ unzip flp-i18n-plugin-0.1.2.zip -d flp-i18n-plugin
 **Windows PowerShell**
 
 ```powershell
-Expand-Archive .\flp-i18n-plugin-0.1.2.zip -DestinationPath .\flp-i18n-plugin
+Expand-Archive .\flp-i18n-plugin-0.1.4.zip -DestinationPath .\flp-i18n-plugin
 .\flp-i18n-plugin\install.ps1 `
-  -Jar    C:\path\flp-i18n-cli.jar `
   -Config C:\path\modules.yaml `
   -Roots  C:\path\workspace
 ```
 
+可选：`-Jar C:\path\flp-i18n-cli.jar`、`-MavenRepo <url>`、`-MavenCoord <coord>`。
+
 安装脚本会：
 
-1. 校验 jar、配置、允许根目录是否存在；
+1. 校验配置、允许根目录是否存在；提供 `--jar` 时同时校验 jar；
 2. 检查 Qoder 是否正在运行（运行中默认中止，可加 `--allow-running` / `-AllowRunning`）；
 3. 复制到 `~/.qoder/plugins/cache/local/flp-i18n/<version>/`（Windows 为 `%USERPROFILE%\.qoder\...`），已有同版本自动改名备份；
-4. 把真实路径写入安装目录 `.mcp.json` 的 `env`；
+4. 把真实路径写入用户配置文件 `~/.qoder/plugins/data/flp-i18n-local/config.json`（Windows 为
+   `%USERPROFILE%\.qoder\plugins\data\flp-i18n-local\config.json`），同时写入安装目录 `.mcp.json` 的 `env` 作为回退；
+   未提供 jar 时不写 `cliJar`，MCP Server 按 Maven 坐标自动下载；
 5. 更新 `installed_plugins_v2.json` 与 `settings.json`，修改前备份为 `*.bak-<时间戳>`；
 6. 若当前终端已设置 `FLP_I18N_TOKEN`：macOS 通过 `launchctl setenv` 注入当前登录会话（不回显）；Windows 需额外加 `-PersistToken` 才写入用户环境变量。
 
@@ -124,7 +137,9 @@ Expand-Archive .\flp-i18n-plugin-0.1.2.zip -DestinationPath .\flp-i18n-plugin
 
 | macOS/Linux | Windows | 说明 |
 | --- | --- | --- |
-| `--jar` | `-Jar` | CLI jar 绝对路径 |
+| `--jar` | `-Jar` | CLI jar 绝对路径（可选，省略时 Maven 自动下载） |
+| `--maven-repo` | `-MavenRepo` | CLI jar 的 Maven 仓库根地址（可选） |
+| `--maven-coord` | `-MavenCoord` | CLI 坐标 `groupId:artifactId:version`（可选） |
 | `--config` | `-Config` | `modules.yaml` 绝对路径 |
 | `--roots` | `-Roots` | 允许访问的根目录，多个用 `:`（Windows 用 `;`）分隔 |
 | `--zip` | `-Zip` | 从 zip 安装 |
@@ -138,19 +153,56 @@ Expand-Archive .\flp-i18n-plugin-0.1.2.zip -DestinationPath .\flp-i18n-plugin
 
 如果一键安装后插件未出现，或更习惯 GUI：
 
-1. 在 Qoder 插件安装入口选择 `dist/flp-i18n-plugin-0.1.2.zip`；
-2. 安装位置为 `~/.qoder/plugins/cache/local/flp-i18n/0.1.2/`；
-3. 便携包的 `.mcp.json` 是占位路径，需要手动编辑该文件的 `env`，写入真实的 jar、配置和允许根目录，再重启 Qoder（只改文件不重启不生效）。
+1. 在 Qoder 插件安装入口选择 `dist/flp-i18n-plugin-0.1.4.zip`；
+2. 安装位置为 `~/.qoder/plugins/cache/local/flp-i18n/0.1.4/`；
+3. 便携包的 `.mcp.json` 是占位路径。安装后执行 `/i18n-config`（或对 Agent 说「配置 modules.yaml 路径」），
+   用 `i18n_config_set` 写入用户配置文件即可，不需要手动编辑 `.mcp.json`；jar 默认按 Maven 自动下载。
 
 安装成功后应能看到：
 
 - 技能 `flp-i18n`
-- 命令 `/i18n-sync`
-- MCP Server `flp-i18n` 及 6 个工具：`i18n_status`、`i18n_scan`、`i18n_diff`、`i18n_validate`、`i18n_upload`、`i18n_download`
+- 命令 `/i18n-sync`、`/i18n-config`
+- MCP Server `flp-i18n` 及 8 个工具：`i18n_config_get`、`i18n_config_set`、`i18n_status`、`i18n_scan`、`i18n_diff`、`i18n_validate`、`i18n_upload`、`i18n_download`
 
 技能和工具通常在新会话中加载；当前会话看不到时，新开一个对话即可。
 
-### 4. 配置 Token
+### 4. 在 Qoder 内查看和修改配置
+
+配置优先级：**用户配置文件 > 环境变量 > 默认值**。默认文件位置：
+
+- macOS / Linux：`~/.qoder/plugins/data/flp-i18n-local/config.json`
+- Windows：`C:\Users\<user>\.qoder\plugins\data\flp-i18n-local\config.json`
+
+```json
+{
+  "version": 1,
+  "configFile": "/abs/path/modules.yaml",
+  "allowedRoots": ["/abs/path/workspace"],
+  "java": "java",
+  "logLevel": "info"
+}
+```
+
+可选字段：`cliJar`（本地 jar，设置后跳过 Maven）、`cliMavenRepo`（仓库根地址）、
+`cliMavenCoordinate`（`groupId:artifactId:version`）。未设置 `cliJar` 时，MCP Server 首次调用业务工具
+会下载并校验 jar 到 `~/.cache/flp-i18n/cli/`。把 `cliJar` 设为空字符串可忽略
+`FLP_I18N_CLI_JAR` 并强制使用 Maven；从旧版本升级时也可不带 `--jar` 重新执行安装脚本。
+
+三种修改方式（都不需要重新打包或重启 Qoder）：
+
+1. **斜杠命令**：`/i18n-config` 查看当前值与来源；`/i18n-config cliJar /abs/path/flp-i18n-cli.jar`
+   直接改单项。
+2. **自然语言**：对 Agent 说「把允许根目录加上 /data/repos」，Agent 会调用 `i18n_config_set`，
+   默认先 dry-run 预览，确认后写入。
+3. **直接编辑文件**：在 Qoder 中打开上面的 JSON 修改并保存，下一次工具调用自动加载。
+
+验证：调用 `i18n_config_get`，`effective.ready` 应为 `true`，`sources` 显示每个值来自 `file` / `env` / `default`。
+配置写入失败时会保留 `.bak-<时间戳>` 备份。
+
+Qoder 插件清单不提供自定义设置表单，所以这些值不会出现在 Qoder 的插件设置页；上述方式就是在 Qoder 内完成配置的入口。
+Token 不在配置文件中管理，继续使用下面的环境变量方式。
+
+### 5. 配置 Token
 
 Token 必须是**纯 JWT**，不要带 `Bearer ` 前缀，前缀由 CLI 自动添加。
 
@@ -210,7 +262,7 @@ read -rs FLP_I18N_TOKEN && export FLP_I18N_TOKEN
 qoder   # 需从同一个 shell 启动
 ```
 
-### 5. 验证安装
+### 6. 验证安装
 
 在新会话中任选一种方式：
 
@@ -233,7 +285,7 @@ qoder   # 需从同一个 shell 启动
 
 CDN 返回 403 属于预期鉴权响应，只要 `reachable=true` 即为可达。
 
-### 6. 升级与卸载
+### 7. 升级与卸载
 
 **升级**：退出 Qoder 后，用新版本 zip 重新执行安装脚本即可。脚本按版本目录安装，同版本会先改名备份；`installed_plugins_v2.json` 中的 `installPath` 会指向新版本。
 
@@ -248,6 +300,23 @@ CDN 返回 403 属于预期鉴权响应，只要 `reachable=true` 即为可达�
 
 卸载插件不会删除业务仓库中 `.i18n-tool/backup` 与 `.i18n-tool/journal`，需要时请手动清理。
 
+### 8. 非 Qoder 客户端（npm）
+
+同一套 MCP Server 也发布为 npm 包，供 DeepSeek Harness、MCP Inspector 等 stdio 客户端使用：
+
+```bash
+FLP_I18N_TOKEN='<token>' \
+FLP_I18N_CONFIG=/abs/path/modules.yaml \
+FLP_I18N_ALLOWED_ROOTS=/abs/path/workspace \
+npx --registry=https://registry.flashexpress.pub/repository/npm-all/ \
+  -y @flash-finance/flp-i18n-mcp
+```
+
+客户端配置为 `command: npx`、`args: ["--registry=https://registry.flashexpress.pub/repository/npm-all/", "-y", "@flash-finance/flp-i18n-mcp"]`，
+Token 通过环境变量注入。内网可先执行
+`npm config set @flash-finance:registry https://registry.flashexpress.pub/repository/npm-all/`，
+之后省略 `--registry`。首次调用业务工具时会自动下载并校验 Maven jar（`~/.cache/flp-i18n/cli/`）。
+
 ---
 
 ## 三、使用方式
@@ -260,6 +329,7 @@ CDN 返回 403 属于预期鉴权响应，只要 `reachable=true` 即为可达�
 | 自然语言 | “把 base-business 缺失的 key 上传到翻译平台” |
 | 自然语言 | “下载 en 译文回填到 flm-flp-base-business” |
 | 斜杠命令 | `/i18n-sync flm-flp-base-business check` |
+| 斜杠命令 | `/i18n-config`（查看/修改运行配置） |
 
 技能触发词包括：多语言、i18n、国际化、properties、key 缺失、上传 key、下载翻译、翻译平台。
 
@@ -281,6 +351,16 @@ CDN 返回 403 属于预期鉴权响应，只要 `reachable=true` 即为可达�
 - `module` 必填，取自 `modules.yaml` 的 `modules` 键。
 - `os` 可省略；仅在同名模块跨 os 时需要（`flp-code` / `flp-enum` / `common-code` / `common-enum`）。
 - `mode` 默认 `check`。
+
+配置相关使用 `/i18n-config`：
+
+```text
+/i18n-config
+/i18n-config cliJar /Users/me/flp-i18n-tool/target/flp-i18n-cli.jar
+```
+
+Agent 会先调用 `i18n_config_get` 展示当前值与来源，再用 `i18n_config_set`（默认 dry-run）预览，
+确认后写入用户配置文件，无需重启 Qoder。
 
 ### 3. check：只读检查
 
@@ -366,6 +446,8 @@ Agent 会自动选择工具；排障或需要精确控制时可参考：
 | 工具 | 参数 |
 | --- | --- |
 | `i18n_status` | 无 |
+| `i18n_config_get` | 无 |
+| `i18n_config_set` | `dryRun`（默认 true）, `cliJar?`, `cliMavenRepo?`, `cliMavenCoordinate?`, `configFile?`, `allowedRoots?`, `java?`, `logLevel?` |
 | `i18n_scan` | `module`, `os?` |
 | `i18n_diff` | `module`, `os?`, `languages?`（数组） |
 | `i18n_validate` | `module`, `os?` |
@@ -418,7 +500,7 @@ Agent 会自动选择工具；排障或需要精确控制时可参考：
 - 写操作要求目标仓库为干净 git 工作区；插件不暴露 `--force`。
 - 上传只新增缺失 key，不覆盖既有翻译；中文冲突只报告。
 - 下载先备份、原子写入、写后校验；远端空值保留本地值。
-- Token 只从环境变量读取；日志只写 stderr，并对 Bearer、JWT、Token、appSecret 等脱敏。
+- Token 只从环境变量读取；`i18n_config_set` 只接受路径与日志级别，拒绝疑似 Token 的值；日志只写 stderr，并对 Bearer、JWT、Token、appSecret 等脱敏。
 - 禁止用生产 Token 做批量上传；先在测试模块小批量（`limit`）验证。
 
 ---
@@ -428,14 +510,18 @@ Agent 会自动选择工具；排障或需要精确控制时可参考：
 | 现象 | 原因与处理 |
 | --- | --- |
 | 工具/技能不可见 | 插件未启用、MCP 进程启动失败或当前会话未加载；新开会话，或重启 Qoder |
-| MCP 状态 `process_exited` | 通常是路径/配置变量未注入；检查包内 `.mcp.json` 的 `env`，重新打包安装 |
+| MCP 状态 `process_exited` | 检查 Qoder 的 MCP 日志；若缺少配置，执行 `/i18n-config` 写入用户配置文件 |
+| 工具返回 `CONFIG_INVALID` | 调用 `i18n_config_get` 查看缺失项，再执行 `/i18n-config` 修正 |
 | `TOKEN_MISSING` | Token 未进入 Qoder 进程环境；重新注入并重启 Qoder |
 | `TOKEN_EXPIRED` | 重新获取 JWT 并注入；`status` 可提前看到过期时间 |
 | `status` 显示 `jwt=true` 但 `diff` 401 | Token 误加了 `Bearer ` 前缀，去掉后重试 |
 | `REMOTE_UNAVAILABLE` | CDN/平台网络问题，查看 `remoteUnavailable` 的 URL 与状态码 |
 | `GIT_DIRTY` | 提交或 stash 目标仓库改动后重新 dry-run |
 | `PLAN_STALE` | 计划期间数据变化，重新 dry-run 并重新确认 |
-| `PATH_NOT_ALLOWED` / `PATH_NOT_FOUND` | 检查 `workspaceRoot`、`repoRoot`、`domainPath` 与 `FLP_I18N_ALLOWED_ROOTS` |
+| `PATH_NOT_ALLOWED` / `PATH_NOT_FOUND` | 检查 `workspaceRoot`、`repoRoot`、`domainPath` 与 `allowedRoots`；必要时用 `/i18n-config` 增加根目录 |
+| `CLI_UNAVAILABLE` | 本地 `cliJar` 路径失效，或 Maven 不可达；用 `/i18n-config` 修正 `cliJar` / `cliMavenRepo`，或改用本地 jar |
+| `CLI_CHECKSUM_MISSING` / `CLI_CHECKSUM_MISMATCH` | Maven 仓库缺少 `.sha256`/`.sha1` 或内容不匹配；确认坐标与仓库，避免使用被篡改的产物 |
+| `CLI_DOWNLOAD_FAILED` | 下载网络失败或仓库返回错误；确认 `cliMavenRepo` 可访问后重试 |
 | `CLASSES_NOT_FOUND` | 业务仓库未编译，先执行 `mvn -pl <domain> -am compile` |
 | `diff` 输出被截断 | 指定 `languages` 缩小范围 |
 | `missingLocally` 数量很大 | CDN 字典按 os 共享，包含其他模块 key；该项仅作参考 |
@@ -451,7 +537,8 @@ Agent 会自动选择工具；排障或需要精确控制时可参考：
 2. 提高 `.qoder-plugin/plugin.json` 的 `version`；
 3. 安装新的 zip，重启 Qoder。
 
-若 jar、配置或允许根目录变化，必须重新打包，因为这三个路径在打包时写入 `.mcp.json` 的 `env`。
+若只是 jar、`modules.yaml` 或允许根目录变化，直接执行 `/i18n-config` 修改用户配置文件即可，不需要重新打包；
+只有插件代码、Skill 或 MCP Server 变化时才需要重新打包。
 
 卸载：在 Qoder 插件管理中停用/移除 `flp-i18n@local`。卸载不会修改业务仓库、`modules.yaml`、Token 或 `.i18n-tool/` 下的 journal/backup。
 

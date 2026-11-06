@@ -77,6 +77,52 @@ export const uploadInput = {
     .describe("每次保存之间的间隔毫秒数"),
 };
 
+export const configGetInput = {};
+
+const pathSchema = z
+  .string()
+  .min(1)
+  .max(4096)
+  .describe("绝对路径；不允许包含换行或空字符");
+
+export const configSetInput = {
+  cliJar: z
+    .string()
+    .max(4096)
+    .optional()
+    .describe("flp-i18n-cli.jar 的绝对路径；传空字符串则忽略本地 jar 与 FLP_I18N_CLI_JAR，改用 Maven 自动下载"),
+  cliMavenRepo: z
+    .string()
+    .min(8)
+    .max(4096)
+    .regex(/^https?:\/\/[^\s]+$/i, "Maven 仓库必须是 http/https 地址")
+    .optional()
+    .describe("Maven 仓库根地址，例如 https://registry.example.com/repository/maven-public/"),
+  cliMavenCoordinate: z
+    .string()
+    .min(5)
+    .max(512)
+    .regex(
+      /^[A-Za-z0-9_.-]+:[A-Za-z0-9_.-]+:[A-Za-z0-9_.-]+(?::[A-Za-z0-9_.-]+)?$/,
+      "坐标格式 groupId:artifactId:version[:classifier]",
+    )
+    .optional()
+    .describe("Maven 坐标，例如 com.flashfin:flp-i18n-tool:0.1.0"),
+  configFile: pathSchema.optional().describe("modules.yaml 的绝对路径"),
+  allowedRoots: z
+    .array(pathSchema)
+    .min(1)
+    .max(20)
+    .optional()
+    .describe("允许访问的仓库根目录列表（绝对路径，必须是已存在的目录）"),
+  java: z.string().min(1).max(1024).optional().describe("Java 可执行文件路径或 PATH 中的命令名"),
+  logLevel: z.enum(["error", "info", "debug"]).optional().describe("日志级别"),
+  dryRun: z
+    .boolean()
+    .default(true)
+    .describe("true（默认）= 只校验并预览，不写配置文件；false = 写入用户配置文件"),
+};
+
 export const downloadInput = {
   module: moduleNameSchema,
   os: osSchema.optional(),
